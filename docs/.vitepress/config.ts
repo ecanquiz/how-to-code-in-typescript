@@ -7,6 +7,7 @@ export default defineConfig({
   base: '/how-to-code-in-typescript/',
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
+    logo: '/me.jpg',
     nav: [
       { text: 'Inicio', link: '/' },
       { text: 'Comenzar', link: '/comenzar/tdd' },
