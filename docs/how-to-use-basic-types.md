@@ -1,4 +1,7 @@
 # Cómo Usar Tipos Básicos en TypeScript
+:::info
+La fuente original (en ingles) de este tutorial se encuentra [aquí](https://www.digitalocean.com/community/tutorials/how-to-use-basic-types-in-typescript)
+:::
 
 ## Introducción
 
@@ -124,4 +127,257 @@ Dado que `hasErrors` e `isValid` se declararon como booleanos, solo se les puede
 ## `number`
 
 El tipo `number` se utiliza para representar números [enteros y flotantes](https://www.digitalocean.com/community/tutorials/understanding-data-types-in-javascript#numbers), como se muestra a continuación:
+
+```ts
+const pi: number = 3.14159;
+const year: number = 2021;
+```
+Este es otro tipo común que se usa con frecuencia en el desarrollo de JavaScript, por lo que esta declaración será común en TypeScript.
+
+## `bigint`
+
+El tipo `bigint` es un tipo que se puede usar cuando se apunta a ES2020. Se usa para representar [BigInt](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt), que es un nuevo tipo de datos para almacenar números enteros mayores que `2^53`.
+
+Prueba el siguiente código:
+
+```ts
+const bigNumber: bigint = 9007199254740993n;
+```
+:::info Nota
+Nota: Si este código arroja un error, es posible que TypeScript no esté configurado para apuntar a `ES2020`. Esto se puede cambiar en su [archivo `tsconfig.json`](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html).
+:::
+
+Si está trabajando con números mayores que `2^53` o con algunas bibliotecas matemáticas, `bigint` será una declaración de tipo común.
+
+## `symbol`
+
+El tipo `symbol` se utiliza para representar el valor primitivo [Symbol](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol). Esto creará un valor único y sin nombre.
+
+Ejecute el siguiente código usando la función constructora `Symbol()`:
+
+```ts
+const mySymbol: symbol = Symbol('unique-symbol-value');
+```
+
+La singularidad de estos valores se puede utilizar para evitar colisiones de referencia. Para obtener más información sobre los `symbols` en JavaScript, lea el [artículo sobre `symbols` en Mozilla Developer Network (MDN)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol).
+
+
+## Arrays
+
+En TypeScript, los [arrays](https://www.digitalocean.com/community/tutorials/understanding-arrays-in-javascript) se escriben en función de los elementos que se espera que tengan. Hay dos formas de escribir una matriz:
+
+- Agregar `[]` al tipo esperado de los elementos de la matriz. Por ejemplo, si desea escribir una matriz que contenga varios valores tipo `number`, podría hacerlo así:
+
+```ts
+const primeNumbers: number[] = [2, 3, 5, 7, 11];
+```
+
+Si asignó un valor tipo `string` a esta matriz, TypeScript le daría un error.
+
+- Usando `Array<T>` Generic, donde `T` es el tipo esperado de los elementos en esa matriz. Usando el ejemplo anterior, se convertiría en esto:
+
+```ts
+const primeNumbers: Array<number> = [2, 3, 5, 7, 11];
+```
+
+Ambas formas son idénticas, así que elija una e intente usar solo ese formato para representar matrices. Esto mantendrá la base de código consistente, lo que a menudo es más importante que elegir un estilo sobre el otro.
+
+Un aspecto importante del uso de variables que contienen matrices en TypeScript es que la mayoría de las veces tendrá que escribirlas. Prueba el siguiente código:
+
+```ts
+const myArray = [];
+```
+
+TypeScript no puede inferir el tipo correcto esperado por esta matriz. En cambio, usa `any[]`, lo que significa una matriz de cualquier cosa. Esto no es de tipo seguro y podría causar confusión más adelante en su código.
+
+Para que su código sea más robusto, se recomienda ser explícito sobre los tipos de la matriz. Por ejemplo, esto aseguraría que la matriz tenga elementos numéricos:
+
+```ts
+const myArray: number[] = [];
+```
+
+De esta manera, si intenta insertar un valor no válido en la matriz, TypeScript generará un error. Pruebe el siguiente código:
+
+```ts
+const myArray: number[] = [];
+
+myArray.push('some-text');
+```
+
+The TypeScript Compiler will show error `2345`:
+
+```sh
+Output
+Argument of type 'string' is not assignable to parameter of type 'number'. (2345)
+```
+
+## Tuplas
+
+Las tuplas son arreglos con un número específico de elementos. Un caso de uso común para esto es almacenar coordenadas 2D en el formato `[x, y]`. Si está trabajando con [React](https://www.digitalocean.com/community/tutorial_series/how-to-code-in-react-js) y usando [Hooks](https://www.digitalocean.com/community/tutorials/how-to-manage-state-with-hooks-on-react-components), el resultado de la mayoría de los Hooks también es una tupla, como `const [isValid, setIsValid] = React.useState(false)`.
+
+Para escribir una tupla, a diferencia de escribir una matriz, envuelve el tipo de los elementos dentro de `[]`, separándolos con comas. Imagina que estás creando una matriz literal con los tipos de los elementos:
+
+```ts
+const position: [number, number] = [1, 2];
+```
+
+Si intenta pasar menos o más que la cantidad de elementos que espera la tupla, el Compilador de TypeScript mostrará el error `2322`.
+
+Tome el siguiente código, por ejemplo:
+
+```ts
+const position: [number, number] = [1, 2, 3];
+```
+
+Esto produciría lo siguiente:
+
+```sh
+Output
+Type '[number, number, number]' is not assignable to type '[number, number]'.
+Source has 3 element(s) but target allows only 2. (2322)
+```
+
+## `any`
+
+En ciertas situaciones, puede ser demasiado difícil especificar los tipos de un valor, como si ese valor proviene de una biblioteca de terceros o de un código que se escribió inicialmente sin TypeScript. Esto puede ser especialmente común cuando se migra un código base de JavaScript a TypeScript en pequeños pasos. En estos escenarios, es posible usar un tipo especial llamado `any`, que significa cualquier tipo. El uso de `any` significa excluirse de la verificación de tipos y es lo mismo que hacer que el compilador de TypeScript ignore ese valor.
+
+Tome el siguiente bloque de código:
+
+```ts
+let thisCanBeAnything: any = 12345;
+
+thisCanBeAnything = "I can be anything - Look, I'm a string now";
+
+thisCanBeAnything = ["Now I'm an array - This is almost like pure JavaScript!"];
+```
+
+Ninguna de estas declaraciones dará un error en TypeScript, ya que el tipo se declaró como `any`.
+
+:::info Nota
+La mayoría de las veces, si puede, debe evitar usar `any`. Usar esto pierde uno de los principales beneficios de TypeScript: tener un código escrito estáticamente.
+:::
+
+## `unknown`
+
+El tipo `unknown` es como una contraparte de tipo seguro de tipo `any`. Puede usar `unknown` cuando desee escribir algo cuyo valor no puede determinar, pero aún desea asegurarse de que cualquier código que use ese valor verifique correctamente el tipo antes de usarlo. Esto es útil para los autores de bibliotecas con funciones en su biblioteca que pueden aceptar una amplia gama de valores de sus usuarios y no desean escribir el valor explícitamente.
+
+Por ejemplo, si tienes una variable llamada `code`:
+
+```ts
+let code: unknown;
+```
+Luego, más adelante en el programa, puede asignar diferentes valores a ese campo, como `35` (`number`), o valores completamente no relacionados, como matrices o incluso objetos.
+
+Pero luego podría asignarlo a una matriz:
+
+```ts
+code = [12345];
+```
+
+Incluso podría reasignarlo a un objeto:
+
+```ts
+code = {};
+```
+
+Si más adelante en el código desea comparar ese valor con algún otro `number`, como:
+
+```ts
+const isCodeGreaterThan100 = code > 100;
+```
+
+El compilador de TypeScript mostrará el error `2571`:
+
+```sh
+Output
+Object is of type 'unknown'. (2571)
+```
+
+Esto sucede porque `code` debe ser un tipo `number` para esta comparación, no un tipo `unknown`. Al realizar cualquier operación con un valor de tipo `unknown`, TypeScript debe asegurarse de que el tipo es el que espera. Un ejemplo de hacer esto es usar el operador `typeof` que ya existe en JavaScript. Examine el siguiente bloque de código:
+
+```ts
+if (typeof code === 'number') {
+  const isCodeGreaterThan100 = code > 60;
+  // ...
+} else {
+  throw new Error('Invalid value received as code');
+}
+```
+
+En este ejemplo, está verificando si `code` es un número utilizando el operador `typeof`. Cuando haga eso, TypeScript obligará al tipo de su variable a `number` dentro de ese bloque `if`, porque en tiempo de ejecución, el código dentro del bloque `if` solo se ejecutará si `code` está configurado actualmente en un número. De lo contrario, arrojará un error de JavaScript que indica que el valor pasado no es válido.
+
+Para comprender las diferencias entre el tipo `unknown` y `any`, puede pensar de `unknown` como "No sé el tipo de ese valor" y `any` como "No me importa qué tipo tiene este valor".
+
+## `void`
+
+Puede usar el tipo `void` para definir la variable en cuestión como si no tuviera ningún tipo. Si asigna el resultado de una función que no devuelve ningún valor a una variable, esa variable tendrá el tipo `void`.
+
+Tome el siguiente código:
+
+```ts
+function doSomething() {};
+
+const resultOfVoidFunction: void = doSomething();
+```
+
+Rara vez tendrá que usar el tipo `void` directamente en TypeScript.
+
+## null y undefined
+
+null and undefined values in TypeScript have their own unique types that are called by the same name:
+
+Los valores `null` y `undefined` en TypeScript tienen sus propios tipos únicos que reciben el mismo nombre:
+
+```ts
+const someNullField: null = null;
+const someUndefinedField: undefined = undefined;
+```
+
+Estos son especialmente útiles al crear sus propios tipos personalizados, que se tratarán más adelante en esta serie.
+
+## `never`
+
+El tipo `never` es el tipo de un valor que nunca existirá. Por ejemplo, imagina que creas una variable numérica:
+
+```ts
+const year: number = 2021;
+```
+
+Si crea un bloque `if` para ejecutar algún código si `year` no es un `number`, podría ser como el siguiente:
+
+```ts
+if (typeof year !== "number") {
+  year;
+}
+```
+
+El tipo de la variable `year` dentro de ese bloque `if` va a ser `never`. Esto se debe a que, dado que `year` se tipea como `number`, nunca se cumplirá la condición para este bloque `if`. Puede pensar en el tipo `never` como un tipo imposible porque esa variable no puede tener un valor en este punto.
+
+## `object`
+
+El tipo de `object` representa cualquier tipo que no sea un tipo primitivo. Esto significa que no es uno de los siguientes tipos:
+
+- `number`
+- `string`
+- `boolean`
+- `bigint`
+- `symbol`
+- `null`
+- `undefined`
+
+El tipo `object` se usa comúnmente para describir literales de objeto porque se le puede asignar cualquier literal de objeto:
+
+```ts
+const programmingLanguage: object = {
+  name: "TypeScript"
+};
+```
+
+:::info Nota
+Hay un tipo mucho mejor que `object` que podría usarse en este caso llamado `Record`. Esto tiene que ver con la creación de tipos personalizados y se trata en un tutorial posterior de esta serie.
+:::
+
+## Conclusión
+
+En este tutorial, probó los diferentes tipos básicos que están disponibles en TypeScript. Estos tipos se usarán con frecuencia cuando se trabaje en una base de código de TypeScript y son los principales bloques de construcción para crear tipos personalizados más complejos.
 

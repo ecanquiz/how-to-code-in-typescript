@@ -4,7 +4,7 @@ layout: home
 
 hero:
   name: "TypeScript"
-  text: "Cómo codificar en TS"
+  text: "Cómo codificar en"
   tagline: "Tutorial"
   image:
     src: /logo.png
@@ -12,7 +12,7 @@ hero:
   actions:
     - theme: brand
       text: Comenzar
-      link: /comenzar/tdd
+      link: /intro
     - theme: alt
       text: CaribesTIC
       link: https://caribestic.github.io/
