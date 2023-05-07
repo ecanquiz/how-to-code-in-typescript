@@ -126,7 +126,8 @@ Dado que `hasErrors` e `isValid` se declararon como booleanos, solo se les puede
 
 ## `number`
 
-El tipo `number` se utiliza para representar números [enteros y flotantes](https://www.digitalocean.com/community/tutorials/understanding-data-types-in-javascript#numbers), como se muestra a continuación:
+El tipo `number` se utiliza para representar números [enteros y flotantes](https://ecanquiz.github.io/how-to-code-in-javascript/understanding-data-types.html#numbers), como se muestra a continuación:
+
 
 ```ts
 const pi: number = 3.14159;
