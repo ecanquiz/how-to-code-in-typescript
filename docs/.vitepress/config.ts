@@ -10,8 +10,8 @@ export default defineConfig({
     logo: '/me.jpg',
     nav: [
       { text: 'Inicio', link: '/' },
-      { text: 'Comenzar', link: '/comenzar/tdd' },
-      { text: 'CaribesTIC', link: 'https://caribestic.github.io/' },      
+      { text: 'Comenzar', link: '/intro' },
+      { text: 'ecanquiz', link: 'https://ecanquiz.github.io/' },      
     ],
     sidebar: [{      
       path: '/',      // optional, link of the title, which should be an absolute path and must exist        
@@ -22,7 +22,7 @@ export default defineConfig({
       ]
     }],
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/CaribesTIC/vue-tdd' }
+      { icon: 'github', link: 'https://github.com/ecanquiz/how-to-code-in-typescript' }
     ]
   }
 })
