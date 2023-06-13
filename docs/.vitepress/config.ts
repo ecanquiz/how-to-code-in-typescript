@@ -18,7 +18,8 @@ export default defineConfig({
       sidebarDepth: 1,    // optional, defaults to 1
       items: [
         { text: 'Introducción', link: '/intro' },
-        { text: 'Cómo Usar Tipos Básicos', link: '/how-to-use-basic-types' },                            
+        { text: 'Cómo Usar Tipos Básicos', link: '/how-to-use-basic-types' },
+        { text: 'Cómo Crear Tipos Personalizados', link: '/how-to-create-custom-types' },                        
       ]
     }],
     socialLinks: [
