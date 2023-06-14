@@ -248,8 +248,60 @@ Esto pasará sin un error.
 
 Ahora que sabe cómo agregar propiedades opcionales a un tipo, es hora de aprender a crear un tipo que pueda contener una cantidad ilimitada de campos.
 
-## Indexable Types
+## Tipos Indexables
 
-The previous examples showed that you cannot add properties to a value of a given type if that type does not specify those properties when it was declared. In this section, you will create indexable types, which are types that allow for any number of fields if they follow the index signature of the type.
+Los ejemplos anteriores mostraron que no puede agregar propiedades a un valor de un tipo determinado si ese tipo no especifica esas propiedades cuando se declaró. En esta sección, creará _tipos indexables_, que son tipos que permiten cualquier cantidad de campos si siguen la firma de índice del tipo.
 
-Imagine you had a Data type to hold an unlimited number of properties of the any type. You could declare this type like this:
+Imagine que tiene un tipo `Data` para contener un número ilimitado de propiedades de tipo `any`. Podría declarar este tipo así:
+
+```ts
+type Data = {
+  [key: string]: any;
+};
+```
+
+Aquí crea un tipo normal con el bloque de definición de tipo entre corchetes (`{}`), y luego agrega una propiedad especial en el formato de `[key: typeOfKeys]: typeOfValues`, donde `typeOfKeys` es el tipo que deben tener las claves de ese objeto, y `typeOfValues` es el tipo que deben tener los valores de esas claves.
+
+Luego puede usarlo normalmente como cualquier otro tipo:
+
+
+```ts
+type Data = {
+  [key: string]: any;
+};
+
+const someData: Data = {
+  someBooleanKey: true,
+  someStringKey: 'text goes here'
+  // ...
+}
+```
+
+Al usar tipos indexables, puede asignar un número ilimitado de propiedades, siempre que coincidan con la _firma del índice_, que es el nombre que se usa para describir los tipos de claves y valores de un tipo indexable. En este caso, las claves tienen un tipo `string` y los valores tienen tipo `any`.
+
+También es posible agregar propiedades específicas que siempre se requieren para su tipo indexable, tal como lo haría con un tipo normal. En el siguiente código resaltado, está agregando la propiedad `status` a su tipo `Data`:
+
+
+```ts
+type Data = {
+  status: boolean;
+  [key: string]: any;
+};
+
+const someData: Data = {
+  status: true,
+  someBooleanKey: true,
+  someStringKey: 'text goes here'
+  // ...
+}
+```
+
+Esto significaría que un objeto de tipo `Data` debe tener una clave `status` con un valor `boolean` para pasar el verificador de tipo.
+
+Ahora que puede crear un objeto con diferentes cantidades de elementos, puede continuar con el aprendizaje de las matrices en TypeScript, que pueden tener una cantidad personalizada de elementos o más.
+
+## Creating Arrays with Number of Elements or More
+
+Using both the array and tuple basic types available in TypeScript, you can create custom types for arrays that should have a minimum amount of elements. In this section, you will use the TypeScript rest operator ... to do this.
+
+Imagine you have a function responsible for merging multiple strings. This function is going to take a single array parameter. This array must have at least two elements, each of which should be strings. You can create a type like this with the following:
