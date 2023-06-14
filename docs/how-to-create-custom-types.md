@@ -300,8 +300,123 @@ Esto significaría que un objeto de tipo `Data` debe tener una clave `status` co
 
 Ahora que puede crear un objeto con diferentes cantidades de elementos, puede continuar con el aprendizaje de las matrices en TypeScript, que pueden tener una cantidad personalizada de elementos o más.
 
-## Creating Arrays with Number of Elements or More
+## Creación de Matrices con Número de Elementos o Más
 
-Using both the array and tuple basic types available in TypeScript, you can create custom types for arrays that should have a minimum amount of elements. In this section, you will use the TypeScript rest operator ... to do this.
+Usando los [tipos básicos de matriz y tupla](../how-to-use-basic-types.html#tipos-basicos-utilizados-en-typescript) disponibles en TypeScript, puede crear tipos personalizados para matrices que deben tener una cantidad mínima de elementos. En esta sección, utilizará el [rest operator](https://www.digitalocean.com/community/tutorials/understanding-destructuring-rest-parameters-and-spread-syntax-in-javascript#rest-parameters) `...` de TypeScript para hacer esto.
 
-Imagine you have a function responsible for merging multiple strings. This function is going to take a single array parameter. This array must have at least two elements, each of which should be strings. You can create a type like this with the following:
+Imagina que tienes una función responsable de fusionar varias cadenas. Esta función tomará un solo parámetro de matriz. Esta matriz debe tener al menos dos elementos, cada uno de los cuales debe ser una cadena. Puede crear un tipo como este con lo siguiente:
+
+```ts
+type MergeStringsArray = [string, string, ...string[]];
+```
+
+El tipo `MergeStringsArray` aprovecha el hecho de que puede usar el _rest operator_ con un tipo de matriz y usa el resultado como el tercer elemento de una tupla. Esto significa que se requieren las dos primeras cadenas, pero no se requieren elementos de cadena adicionales posteriores.
+
+Si una matriz tiene menos de dos elementos de cadena, no será válida, como la siguiente:
+
+```ts
+const invalidArray: MergeStringsArray = ['some-string']
+```
+
+El compilador de TypeScript dará el error `2322` al verificar esta matriz:
+
+
+```sh
+Output
+Type '[string]' is not assignable to type 'MergeStringsArray'.
+Source has 1 element(s) but target requires 2. (2322)
+```
+
+Hasta este momento, ha creado sus propios tipos personalizados a partir de una combinación de tipos básicos. En la siguiente sección, creará un nuevo tipo al componer dos o más tipos personalizados juntos.
+
+
+## Componer Tipos
+
+Esta sección analizará dos formas en las que puede componer tipos juntos. Estos utilizarán el _operador de unión_ para pasar cualquier dato que se adhiera a un tipo u otro y el _operador de intersección_ para pasar datos que satisfagan todas las condiciones en ambos tipos.
+
+## Uniones
+
+Las uniones se crean usando el `|` (pipe), que representa un valor que puede tener cualquiera de los tipos en la unión. Tome el siguiente ejemplo:
+
+```ts
+type ProductCode = number | string
+```
+
+En este código, `ProductCode` puede ser un `string` o un `number`. El siguiente código pasará el verificador de tipos:
+
+
+```ts
+type ProductCode = number | string;
+
+const productCodeA: ProductCode = 'this-works';
+
+const productCodeB: ProductCode = 1024;
+```
+
+Se puede crear un tipo de unión a partir de una unión de cualquier tipo de TypeScript válido.
+
+## Intersecciones
+
+Puede usar tipos de intersección para crear un tipo completamente nuevo que tenga todas las propiedades de todos los tipos que se intersectan entre sí.
+
+Por ejemplo, imagine que tiene algunos campos comunes que siempre aparecen en la respuesta de sus llamadas API, luego campos específicos para algunos puntos finales:
+
+```ts
+type StatusResponse = {
+  status: number;
+  isValid: boolean;
+};
+
+type User = {
+  name: string;
+};
+
+type GetUserResponse = {
+  user: User;
+};
+```
+
+En este caso, todas las respuestas tendrán las propiedades `status` y `isValid`, pero solo las respuestas de los usuarios tendrán el campo adicional `user`. Para crear la respuesta resultante de una llamada de usuario de API específica utilizando un tipo de intersección, combine los tipos `StatusResponse` y `GetUserResponse`:
+
+```ts
+type ApiGetUserResponse = StatusResponse & GetUserResponse;
+```
+
+El tipo `ApiGetUserResponse` va a tener todas las propiedades disponibles en `StatusResponse` y las disponibles en `GetUserResponse`. Esto significa que los datos solo pasarán el verificador de tipos si cumplen todas las condiciones de ambos tipos. El siguiente ejemplo funcionará:
+
+```ts
+let response: ApiGetUserResponse = {
+    status: 200,
+    isValid: true,
+    user: {
+        name: 'Sammy'
+    }
+}
+```
+
+Otro ejemplo sería el tipo de filas devueltas por un cliente de base de datos para una consulta que contiene uniones. Podría utilizar un tipo de intersección para especificar el resultado de dicha consulta:
+
+```ts
+type UserRoleRow = {
+  role: string;
+}
+
+type UserRow = {
+  name: string;
+};
+
+type UserWithRoleRow = UserRow & UserRoleRow;
+```
+
+Más tarde, si usó una función `fetchRowsFromDatabase()` como la siguiente:
+
+```ts
+ const joinedRows: UserWithRoleRow = fetchRowsFromDatabase()
+```
+
+La constante `joinedRows` resultante tendría que tener una propiedad `role` y una propiedad `name` que contuvieran valores de cadena para pasar el verificador de tipos.
+
+## Using Template Strings Types
+
+Starting with TypeScript 4.1, it is possible to create types using template string types. This will allow you to create types that check specific string formats and add more customization to your TypeScript project.
+
