@@ -302,7 +302,7 @@ Ahora que puede crear un objeto con diferentes cantidades de elementos, puede co
 
 ## Creación de Matrices con Número de Elementos o Más
 
-Usando los [tipos básicos de matriz y tupla](../how-to-use-basic-types.html#tipos-basicos-utilizados-en-typescript) disponibles en TypeScript, puede crear tipos personalizados para matrices que deben tener una cantidad mínima de elementos. En esta sección, utilizará el [rest operator](https://www.digitalocean.com/community/tutorials/understanding-destructuring-rest-parameters-and-spread-syntax-in-javascript#rest-parameters) `...` de TypeScript para hacer esto.
+Usando los [tipos básicos de matriz y tupla](./how-to-use-basic-types.html#tipos-basicos-utilizados-en-typescript) disponibles en TypeScript, puede crear tipos personalizados para matrices que deben tener una cantidad mínima de elementos. En esta sección, utilizará el [rest operator](https://www.digitalocean.com/community/tutorials/understanding-destructuring-rest-parameters-and-spread-syntax-in-javascript#rest-parameters) `...` de TypeScript para hacer esto.
 
 Imagina que tienes una función responsable de fusionar varias cadenas. Esta función tomará un solo parámetro de matriz. Esta matriz debe tener al menos dos elementos, cada uno de los cuales debe ser una cadena. Puede crear un tipo como este con lo siguiente:
 
@@ -451,7 +451,7 @@ La creación de tipos con cadenas de plantilla le ayuda a personalizar su tipo s
 
 ## Usar Aserciones de Tipo
 
-El [tipo `any`](../how-to-use-basic-types.html#tipos-basicos-utilizados-en-typescript) se puede usar como el tipo de cualquier valor, lo que a menudo no proporciona la tipificación fuerte necesaria para obtener el beneficio completo de TypeScript. Pero a veces puede terminar con algunas variables vinculadas a `any` que esté fuera de su control. Esto sucederá si usa dependencias externas que no se escribieron en TypeScript o que no tienen una [declaración de tipo disponible](https://www.typescriptlang.org/docs/handbook/declaration-files/publishing.html).
+El [tipo `any`](./how-to-use-basic-types.html#tipos-basicos-utilizados-en-typescript) se puede usar como el tipo de cualquier valor, lo que a menudo no proporciona la tipificación fuerte necesaria para obtener el beneficio completo de TypeScript. Pero a veces puede terminar con algunas variables vinculadas a `any` que esté fuera de su control. Esto sucederá si usa dependencias externas que no se escribieron en TypeScript o que no tienen una [declaración de tipo disponible](https://www.typescriptlang.org/docs/handbook/declaration-files/publishing.html).
 
 En caso de que desee que su código sea seguro para el tipo en esos escenarios, puede usar aserciones de tipo, que es una forma de cambiar el tipo de una variable a otro tipo. Las aserciones de tipo son posibles al agregar `as NewType` después de su variable. Esto cambiará el tipo de la variable al especificado después de la palabra clave `as`.
 
