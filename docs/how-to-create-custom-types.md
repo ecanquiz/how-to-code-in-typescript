@@ -416,7 +416,60 @@ Más tarde, si usó una función `fetchRowsFromDatabase()` como la siguiente:
 
 La constante `joinedRows` resultante tendría que tener una propiedad `role` y una propiedad `name` que contuvieran valores de cadena para pasar el verificador de tipos.
 
-## Using Template Strings Types
+## Usar Tipos de Cadenas de Plantilla
 
-Starting with TypeScript 4.1, it is possible to create types using template string types. This will allow you to create types that check specific string formats and add more customization to your TypeScript project.
+A partir de TypeScript 4.1, es posible crear tipos utilizando tipos de [cadena de plantilla](https://www.digitalocean.com/community/tutorials/understanding-template-literals-in-javascript). Esto le permitirá crear tipos que verifiquen formatos de cadena específicos y agregar más personalización a su proyecto de TypeScript.
+
+Para crear tipos de cadena de plantilla, utiliza una sintaxis que es casi la misma que usaría al crear literales de cadena de plantilla. Pero en lugar de valores, usará otros tipos dentro de la plantilla de cadena.
+
+Imagine que desea crear un tipo que pase todas las cadenas que comienzan con `get`. Podrías hacerlo usando tipos de cadena de plantilla:
+
+```ts
+type StringThatStartsWithGet = `get${string}`;
+
+const myString: StringThatStartsWithGet = 'getAbc';
+```
+
+`myString` pasará el verificador de tipo aquí porque la cadena comienza con `get` y luego es seguida por una cadena adicional.
+
+Si pasaste un valor no válido a tu tipo, como el siguiente `invalidStringValue`:
+
+```ts
+type StringThatStartsWithGet = `get${string}`;
+
+const invalidStringValue: StringThatStartsWithGet = 'something';
+```
+
+El compilador de TypeScript le daría el error `2322`:
+
+```sh
+Output
+Type '"something"' is not assignable to type '`get${string}`'. (2322)
+```
+
+La creación de tipos con cadenas de plantilla le ayuda a personalizar su tipo según las necesidades específicas de su proyecto. En la siguiente sección, probará aserciones de tipo, que agregan un tipo a datos que de otro modo no estarían tipificados.
+
+## Usar Aserciones de Tipo
+
+El [tipo `any`](../how-to-use-basic-types.html#tipos-basicos-utilizados-en-typescript) se puede usar como el tipo de cualquier valor, lo que a menudo no proporciona la tipificación fuerte necesaria para obtener el beneficio completo de TypeScript. Pero a veces puede terminar con algunas variables vinculadas a `any` que esté fuera de su control. Esto sucederá si usa dependencias externas que no se escribieron en TypeScript o que no tienen una [declaración de tipo disponible](https://www.typescriptlang.org/docs/handbook/declaration-files/publishing.html).
+
+En caso de que desee que su código sea seguro para el tipo en esos escenarios, puede usar aserciones de tipo, que es una forma de cambiar el tipo de una variable a otro tipo. Las aserciones de tipo son posibles al agregar `as NewType` después de su variable. Esto cambiará el tipo de la variable al especificado después de la palabra clave `as`.
+
+Tome el siguiente ejemplo:
+
+```ts
+const valueA: any = 'something';
+
+const valueB = valueA as string;
+```
+
+`valueA` tiene el tipo `any`, pero, al usar la palabra clave `as`, este código obliga a `valueB` a tener el tipo `string`.
+
+:::tip Nota
+Para afirmar que una variable de `TypeA` tenga el tipo `TypeB`, `TypeB` debe ser un subtipo de `TypeA`. Casi todos los tipos de TypeScript, además de `never`, son un subtipo de `any`, incluido el `unknown`.
+:::
+
+
+
+
 
