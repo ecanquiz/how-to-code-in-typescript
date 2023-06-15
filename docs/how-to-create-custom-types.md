@@ -300,8 +300,178 @@ Esto significaría que un objeto de tipo `Data` debe tener una clave `status` co
 
 Ahora que puede crear un objeto con diferentes cantidades de elementos, puede continuar con el aprendizaje de las matrices en TypeScript, que pueden tener una cantidad personalizada de elementos o más.
 
-## Creating Arrays with Number of Elements or More
+## Creación de Matrices con Número de Elementos o Más
 
-Using both the array and tuple basic types available in TypeScript, you can create custom types for arrays that should have a minimum amount of elements. In this section, you will use the TypeScript rest operator ... to do this.
+Usando los [tipos básicos de matriz y tupla](../how-to-use-basic-types.html#tipos-basicos-utilizados-en-typescript) disponibles en TypeScript, puede crear tipos personalizados para matrices que deben tener una cantidad mínima de elementos. En esta sección, utilizará el [rest operator](https://www.digitalocean.com/community/tutorials/understanding-destructuring-rest-parameters-and-spread-syntax-in-javascript#rest-parameters) `...` de TypeScript para hacer esto.
 
-Imagine you have a function responsible for merging multiple strings. This function is going to take a single array parameter. This array must have at least two elements, each of which should be strings. You can create a type like this with the following:
+Imagina que tienes una función responsable de fusionar varias cadenas. Esta función tomará un solo parámetro de matriz. Esta matriz debe tener al menos dos elementos, cada uno de los cuales debe ser una cadena. Puede crear un tipo como este con lo siguiente:
+
+```ts
+type MergeStringsArray = [string, string, ...string[]];
+```
+
+El tipo `MergeStringsArray` aprovecha el hecho de que puede usar el _rest operator_ con un tipo de matriz y usa el resultado como el tercer elemento de una tupla. Esto significa que se requieren las dos primeras cadenas, pero no se requieren elementos de cadena adicionales posteriores.
+
+Si una matriz tiene menos de dos elementos de cadena, no será válida, como la siguiente:
+
+```ts
+const invalidArray: MergeStringsArray = ['some-string']
+```
+
+El compilador de TypeScript dará el error `2322` al verificar esta matriz:
+
+
+```sh
+Output
+Type '[string]' is not assignable to type 'MergeStringsArray'.
+Source has 1 element(s) but target requires 2. (2322)
+```
+
+Hasta este momento, ha creado sus propios tipos personalizados a partir de una combinación de tipos básicos. En la siguiente sección, creará un nuevo tipo al componer dos o más tipos personalizados juntos.
+
+
+## Componer Tipos
+
+Esta sección analizará dos formas en las que puede componer tipos juntos. Estos utilizarán el _operador de unión_ para pasar cualquier dato que se adhiera a un tipo u otro y el _operador de intersección_ para pasar datos que satisfagan todas las condiciones en ambos tipos.
+
+## Uniones
+
+Las uniones se crean usando el `|` (pipe), que representa un valor que puede tener cualquiera de los tipos en la unión. Tome el siguiente ejemplo:
+
+```ts
+type ProductCode = number | string
+```
+
+En este código, `ProductCode` puede ser un `string` o un `number`. El siguiente código pasará el verificador de tipos:
+
+
+```ts
+type ProductCode = number | string;
+
+const productCodeA: ProductCode = 'this-works';
+
+const productCodeB: ProductCode = 1024;
+```
+
+Se puede crear un tipo de unión a partir de una unión de cualquier tipo de TypeScript válido.
+
+## Intersecciones
+
+Puede usar tipos de intersección para crear un tipo completamente nuevo que tenga todas las propiedades de todos los tipos que se intersectan entre sí.
+
+Por ejemplo, imagine que tiene algunos campos comunes que siempre aparecen en la respuesta de sus llamadas API, luego campos específicos para algunos puntos finales:
+
+```ts
+type StatusResponse = {
+  status: number;
+  isValid: boolean;
+};
+
+type User = {
+  name: string;
+};
+
+type GetUserResponse = {
+  user: User;
+};
+```
+
+En este caso, todas las respuestas tendrán las propiedades `status` y `isValid`, pero solo las respuestas de los usuarios tendrán el campo adicional `user`. Para crear la respuesta resultante de una llamada de usuario de API específica utilizando un tipo de intersección, combine los tipos `StatusResponse` y `GetUserResponse`:
+
+```ts
+type ApiGetUserResponse = StatusResponse & GetUserResponse;
+```
+
+El tipo `ApiGetUserResponse` va a tener todas las propiedades disponibles en `StatusResponse` y las disponibles en `GetUserResponse`. Esto significa que los datos solo pasarán el verificador de tipos si cumplen todas las condiciones de ambos tipos. El siguiente ejemplo funcionará:
+
+```ts
+let response: ApiGetUserResponse = {
+    status: 200,
+    isValid: true,
+    user: {
+        name: 'Sammy'
+    }
+}
+```
+
+Otro ejemplo sería el tipo de filas devueltas por un cliente de base de datos para una consulta que contiene uniones. Podría utilizar un tipo de intersección para especificar el resultado de dicha consulta:
+
+```ts
+type UserRoleRow = {
+  role: string;
+}
+
+type UserRow = {
+  name: string;
+};
+
+type UserWithRoleRow = UserRow & UserRoleRow;
+```
+
+Más tarde, si usó una función `fetchRowsFromDatabase()` como la siguiente:
+
+```ts
+ const joinedRows: UserWithRoleRow = fetchRowsFromDatabase()
+```
+
+La constante `joinedRows` resultante tendría que tener una propiedad `role` y una propiedad `name` que contuvieran valores de cadena para pasar el verificador de tipos.
+
+## Usar Tipos de Cadenas de Plantilla
+
+A partir de TypeScript 4.1, es posible crear tipos utilizando tipos de [cadena de plantilla](https://www.digitalocean.com/community/tutorials/understanding-template-literals-in-javascript). Esto le permitirá crear tipos que verifiquen formatos de cadena específicos y agregar más personalización a su proyecto de TypeScript.
+
+Para crear tipos de cadena de plantilla, utiliza una sintaxis que es casi la misma que usaría al crear literales de cadena de plantilla. Pero en lugar de valores, usará otros tipos dentro de la plantilla de cadena.
+
+Imagine que desea crear un tipo que pase todas las cadenas que comienzan con `get`. Podrías hacerlo usando tipos de cadena de plantilla:
+
+```ts
+type StringThatStartsWithGet = `get${string}`;
+
+const myString: StringThatStartsWithGet = 'getAbc';
+```
+
+`myString` pasará el verificador de tipo aquí porque la cadena comienza con `get` y luego es seguida por una cadena adicional.
+
+Si pasaste un valor no válido a tu tipo, como el siguiente `invalidStringValue`:
+
+```ts
+type StringThatStartsWithGet = `get${string}`;
+
+const invalidStringValue: StringThatStartsWithGet = 'something';
+```
+
+El compilador de TypeScript le daría el error `2322`:
+
+```sh
+Output
+Type '"something"' is not assignable to type '`get${string}`'. (2322)
+```
+
+La creación de tipos con cadenas de plantilla le ayuda a personalizar su tipo según las necesidades específicas de su proyecto. En la siguiente sección, probará aserciones de tipo, que agregan un tipo a datos que de otro modo no estarían tipificados.
+
+## Usar Aserciones de Tipo
+
+El [tipo `any`](../how-to-use-basic-types.html#tipos-basicos-utilizados-en-typescript) se puede usar como el tipo de cualquier valor, lo que a menudo no proporciona la tipificación fuerte necesaria para obtener el beneficio completo de TypeScript. Pero a veces puede terminar con algunas variables vinculadas a `any` que esté fuera de su control. Esto sucederá si usa dependencias externas que no se escribieron en TypeScript o que no tienen una [declaración de tipo disponible](https://www.typescriptlang.org/docs/handbook/declaration-files/publishing.html).
+
+En caso de que desee que su código sea seguro para el tipo en esos escenarios, puede usar aserciones de tipo, que es una forma de cambiar el tipo de una variable a otro tipo. Las aserciones de tipo son posibles al agregar `as NewType` después de su variable. Esto cambiará el tipo de la variable al especificado después de la palabra clave `as`.
+
+Tome el siguiente ejemplo:
+
+```ts
+const valueA: any = 'something';
+
+const valueB = valueA as string;
+```
+
+`valueA` tiene el tipo `any`, pero, al usar la palabra clave `as`, este código obliga a `valueB` a tener el tipo `string`.
+
+:::tip Nota
+Para afirmar que una variable de `TypeA` tenga el tipo `TypeB`, `TypeB` debe ser un subtipo de `TypeA`. Casi todos los tipos de TypeScript, además de `never`, son un subtipo de `any`, incluido el `unknown`.
+:::
+
+## Utility Types
+
+In the previous sections, you reviewed multiple ways to create custom types out of basic types. But sometimes you do not want to create a completely new type from scratch. There are times when it might be best to use a few properties of an existing type, or even create a new type that has the same shape as another type, but with all the properties set to be optional.
+
+
+
