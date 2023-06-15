@@ -469,7 +469,9 @@ const valueB = valueA as string;
 Para afirmar que una variable de `TypeA` tenga el tipo `TypeB`, `TypeB` debe ser un subtipo de `TypeA`. Casi todos los tipos de TypeScript, además de `never`, son un subtipo de `any`, incluido el `unknown`.
 :::
 
+## Utility Types
 
+In the previous sections, you reviewed multiple ways to create custom types out of basic types. But sometimes you do not want to create a completely new type from scratch. There are times when it might be best to use a few properties of an existing type, or even create a new type that has the same shape as another type, but with all the properties set to be optional.
 
 
 
