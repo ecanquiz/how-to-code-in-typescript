@@ -469,9 +469,183 @@ const valueB = valueA as string;
 Para afirmar que una variable de `TypeA` tenga el tipo `TypeB`, `TypeB` debe ser un subtipo de `TypeA`. Casi todos los tipos de TypeScript, además de `never`, son un subtipo de `any`, incluido el `unknown`.
 :::
 
-## Utility Types
+## Tipos de utilidad
 
-In the previous sections, you reviewed multiple ways to create custom types out of basic types. But sometimes you do not want to create a completely new type from scratch. There are times when it might be best to use a few properties of an existing type, or even create a new type that has the same shape as another type, but with all the properties set to be optional.
+En las secciones anteriores, revisó varias formas de crear tipos personalizados a partir de tipos básicos. Pero a veces no desea crear un tipo completamente nuevo desde cero. Hay momentos en los que puede ser mejor usar algunas propiedades de un tipo existente, o incluso crear un nuevo tipo que tenga la misma forma que otro tipo, pero con todas las propiedades configuradas como opcionales.
+
+Todo esto es posible utilizando los tipos de utilidades existentes disponibles con TypeScript. Esta sección cubrirá algunos de esos tipos de utilidad; para obtener una lista completa de todos los disponibles, eche un vistazo a la parte [Tipos de Utilidad](https://www.typescriptlang.org/docs/handbook/utility-types.html) del manual de TypeScript.
 
 
+Todos los tipos de utilidad son _Tipos Genéricos_, que puede considerar como un tipo que acepta otros tipos como parámetros. Un tipo genérico se puede identificar al poder pasarle parámetros de tipo usando la sintaxis `<TypeA, TypeB, ...>`.
+
+## `Record<Key, Value>`
+
+El tipo de utilidad `Record` se puede usar para crear un tipo indexable de una manera más limpia que usar la firma de índice cubierta anteriormente.
+
+En su ejemplo de tipos indexables, tenía el siguiente tipo:
+
+```ts
+type Data = {
+  [key: string]: any;
+};
+```
+
+Puede usar el tipo de utilidad `Record` en lugar de un tipo indexable como este:
+
+```ts
+type Data = Record<string, any>;
+```
+
+El primer parámetro de tipo del genérico `Record` es el tipo de cada clave. En este ejemplo, todas las claves deben ser cadenas. El segundo parámetro de tipo es el tipo de cada `value` de esas claves. En este ejemplo se permitiría que los valores sean `any`:
+
+## `Omit<Type, Fields>`
+
+El tipo de utilidad `Omit` es útil para crear un nuevo tipo basado en otro, mientras se excluyen algunas propiedades que no desea en el tipo resultante.
+
+Imagine que tiene el siguiente tipo para representar el tipo de una fila de usuario en una base de datos:
+
+```ts
+type UserRow = {
+  id: number;
+  name: string;
+  email: string;
+  addressId: string;
+};
+```
+
+Si en su código está recuperando todos los campos excepto el de `addressId`, puede usar `Omit` para crear un nuevo tipo sin ese campo:
+
+
+```ts{8}
+type UserRow = {
+  id: number;
+  name: string;
+  email: string;
+  addressId: string;
+};
+
+type UserRowWithoutAddressId = Omit<UserRow, 'addressId'>;
+```
+
+El primer argumento para `Omit` es el tipo en el que se basa el nuevo tipo. El segundo es el campo que le gustaría omitir.
+
+Si pasa el cursor sobre `UserRowWithoutAddressId` en su editor de código, encontrará que tiene todas las propiedades del tipo `UserRow` excepto las que omitió.
+
+Puede pasar varios campos al segundo parámetro de tipo mediante una unión de cadenas. Digamos que también quería omitir el campo de `id`, podría hacer esto:
+
+```ts{8}
+type UserRow = {
+  id: number;
+  name: string;
+  email: string;
+  addressId: string;
+};
+
+type UserRowWithoutIds = Omit<UserRow, 'id' | 'addressId'>;
+```
+
+## `Pick<Type, Fields>`
+
+El tipo de utilidad `Pick` es exactamente lo contrario del tipo `Omit`. En lugar de decir los campos que desea omitir, especifique los campos que desea usar de otro tipo.
+
+Usando el mismo `UserRow` que usó antes:
+
+```ts
+type UserRow = {
+  id: number;
+  name: string;
+  email: string;
+  addressId: string;
+};
+```
+
+Imagine que necesita seleccionar solo la clave de `email` de la fila de la base de datos. Podrías crear tal tipo como este usando `Pick`:
+
+```ts{8}
+type UserRow = {
+  id: number;
+  name: string;
+  email: string;
+  addressId: string;
+};
+
+type UserRowWithEmailOnly = Pick<UserRow, 'email'>;
+```
+
+El primer argumento para `Pick` aquí especifica el tipo en el que se basa el nuevo tipo. La segunda es la clave que le gustaría incluir.
+
+Esto sería equivalente a lo siguiente:
+
+```ts
+type UserRowWithEmailOnly = {
+    email: string;
+}
+```
+
+También puede seleccionar varios campos mediante una unión de cadenas:
+
+
+```ts{8}
+type UserRow = {
+  id: number;
+  name: string;
+  email: string;
+  addressId: string;
+};
+
+type UserRowWithEmailOnly = Pick<UserRow, 'name' | 'email'>;
+```
+
+## `Partial<Type>`
+
+Usando el mismo ejemplo de `UserRow`, imagine que desea crear un nuevo tipo que coincida con el objeto que su cliente de base de datos puede usar para insertar nuevos datos en su tabla de usuario, pero con un pequeño detalle: su base de datos tiene valores predeterminados para todos los campos, por lo que no es requerido que pase ninguno de ellos. Para hacer esto, puede usar un tipo de utilidad `Partial` para incluir opcionalmente todos los campos del tipo base.
+
+Su tipo existente, `UserRow`, tiene todas las propiedades requeridas:
+
+```ts
+type UserRow = {
+  id: number;
+  name: string;
+  email: string;
+  addressId: string;
+};
+```
+
+Para crear un nuevo tipo donde todas las propiedades son opcionales, puede usar el tipo de utilidad `Partial<Type>` como el siguiente:
+
+```ts{8}
+type UserRow = {
+  id: number;
+  name: string;
+  email: string;
+  addressId: string;
+};
+
+type UserRowInsert = Partial<UserRow>;
+```
+
+Esto es exactamente lo mismo que tener su `UserRowInsert` así:
+
+
+```ts
+type UserRow = {
+  id: number;
+  name: string;
+  email: string;
+  addressId: string;
+};
+
+type UserRowInsert = {
+  id?: number | undefined;
+  name?: string | undefined;
+  email?: string | undefined;
+  addressId?: string | undefined;
+};
+```
+
+Los tipos de utilidad son un gran recurso porque proporcionan una forma más rápida de crear tipos que crearlos a partir de los tipos básicos en TypeScript.
+
+## Conclusión
+
+La creación de sus propios tipos personalizados para representar las estructuras de datos utilizadas en su propio código puede proporcionar una solución de TypeScript flexible y útil para su proyecto. Además de aumentar la seguridad de tipo de su propio código como un todo, tener sus propios objetos de negocio tipeados como estructuras de datos en el código aumentará la documentación general del código base y mejorará su propia experiencia de desarrollador cuando trabaje con compañeros de equipo en la misma base de código.
 
