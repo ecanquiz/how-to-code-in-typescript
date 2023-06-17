@@ -1,6 +1,6 @@
 # Cómo Usar Funciones en TypeScript
 
-Crear y usar funciones es un aspecto fundamental de cualquier lenguaje de programación, y [TypeScript](https://www.typescriptlang.org/) no es diferente. TypeScript es totalmente compatible con la existente [sintaxis para funciones de JavaScript](https://www.digitalocean.com/community/tutorials/how-to-define-functions-in-javascript), al tiempo que agrega [información de tipo](../../how-to-use-basic-types.html) y [sobrecarga de funciones](https://en.wikipedia.org/wiki/Function_overloading) como nuevas características. Además de proporcionar documentación adicional a la función, la información de tipo también reduce las posibilidades de errores en el código porque existe un menor riesgo de pasar tipos de datos no válidos a una función de tipo seguro.
+Crear y usar funciones es un aspecto fundamental de cualquier lenguaje de programación, y [TypeScript](https://www.typescriptlang.org/) no es diferente. TypeScript es totalmente compatible con la existente [sintaxis para funciones de JavaScript](https://www.digitalocean.com/community/tutorials/how-to-define-functions-in-javascript), al tiempo que agrega [información de tipo](./how-to-use-basic-types.html) y [sobrecarga de funciones](https://en.wikipedia.org/wiki/Function_overloading) como nuevas características. Además de proporcionar documentación adicional a la función, la información de tipo también reduce las posibilidades de errores en el código porque existe un menor riesgo de pasar tipos de datos no válidos a una función de tipo seguro.
 
 En este tutorial, comenzará creando las funciones más básicas con información de tipo, luego pasará a escenarios más complejos, como el uso de [resto de parámetros](https://www.digitalocean.com/community/tutorials/understanding-destructuring-rest-parameters-and-spread-syntax-in-javascript) y la sobrecarga de funciones. Probarás diferentes ejemplos de código, que puedes seguir en tu propio entorno de TypeScript o en [TypeScript Playground](https://www.typescriptlang.org/play?ts=4.2.2#), un entorno en línea que te permite escribir TypeScript directamente en el navegador.
 
@@ -58,7 +58,7 @@ Output
 Argument of type 'string' is not assignable to parameter of type 'number'. (2345)
 ```
 
-Puede usar cualquier tipo en sus funciones, no solo [tipos básicos](../../how-to-use-basic-types.html). Por ejemplo, imagine que tiene un tipo `User` que se ve así:
+Puede usar cualquier tipo en sus funciones, no solo [tipos básicos](./how-to-use-basic-types.html). Por ejemplo, imagine que tiene un tipo `User` que se ve así:
 
 ```ts
 type User = {
