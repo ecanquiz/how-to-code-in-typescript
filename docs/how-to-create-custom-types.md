@@ -1,4 +1,8 @@
-# Cómo Crear Tipos Personalizados en TypeScript 
+# Cómo Crear Tipos Personalizados en TypeScript
+
+:::info
+La fuente original (en ingles) de este tutorial se encuentra [aquí](https://www.digitalocean.com/community/tutorials/how-to-create-custom-types-in-typescript)
+:::
 
 ## Introducción
 
