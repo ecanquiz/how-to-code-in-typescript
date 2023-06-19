@@ -20,7 +20,8 @@ export default defineConfig({
         { text: 'Introducción', link: '/intro' },
         { text: 'Cómo Usar Tipos Básicos', link: '/how-to-use-basic-types' },
         { text: 'Cómo Crear Tipos Personalizados', link: '/how-to-create-custom-types' },
-        { text: 'Cómo Usar Funciones', link: '/how-to-use-functions' },                       
+        { text: 'Cómo Usar Funciones', link: '/how-to-use-functions' },
+        { text: 'Cómo Usar Enumeraciones', link: '/how-to-use-enums' },                   
       ]
     }],
     socialLinks: [
