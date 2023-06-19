@@ -279,7 +279,426 @@ eventCallback: (target: EventTarget) => void
 
 Esto significa que su función `onEvent` espera que se pase otra función en el parámetro `eventCallback`. Esta función debería aceptar un solo argumento del tipo `EventTarget`. El tipo de retorno de esta función es ignorado por su función `onEvent`, por lo que está utilizando [`void`](./how-to-use-basic-types.html) como tipo.
 
-## Using Typed Asynchronous Functions
+
+## Uso de Funciones Asincrónicas Tipadas
+
+Cuando se trabaja con JavaScript, es relativamente común tener [funciones asíncronas](https://www.digitalocean.com/community/tutorials/understanding-the-event-loop-callbacks-promises-and-async-await-in-javascript). TypeScript tiene una forma específica de lidiar con esto. En esta sección, creará funciones asincrónicas en TypeScript.
+
+La sintaxis para crear funciones asincrónicas es la misma que la utilizada para JavaScript, con la adición de permitir tipos:
+
+
+```ts
+async function asyncFunction(param1: number) {
+  // ... function implementation ...
+}
+```
+
+Hay una gran diferencia entre agregar tipos a una función normal y agregar tipos a una función asíncrona: en una función asíncrona, el tipo de retorno siempre debe ser el genérico `Promise<T>`. El genérico `Promise<T>` representa el objeto `Promise` que devuelve una función asincrónica, donde `T` es el tipo de valor en el que se resuelve la promesa.
+
+Imagina que tienes un tipo `User`:
+
+
+```ts
+type User = {
+  id: number;
+  firstName: string;
+};
+```
+
+Imagine también que tiene algunos objetos de usuario en un almacén de datos. Estos datos podrían almacenarse en cualquier lugar, como en un archivo, una base de datos o detrás de una solicitud de API. Para simplificar, en este ejemplo usará una [matriz](https://www.digitalocean.com/community/tutorials/understanding-arrays-in-javascript):
+
+
+```ts
+type User = {
+  id: number;
+  firstName: string;
+};
+
+const users: User[] = [
+  { id: 1, firstName: "Jane" },
+  { id: 2, firstName: "Jon" }
+];
+```
+
+Si desea crear una función de tipo seguro que recupere un usuario por ID de forma asíncrona, podría hacerlo así:
+
+
+```ts
+async function getUserById(userId: number): Promise<User | null> {
+  const foundUser = users.find(user => user.id === userId);
+
+  if (!foundUser) {
+    return null;
+  }
+
+  return foundUser;
+}
+```
+
+
+En esta función, primero está declarando su función como `async`. Luego estás especificando que acepta como primer parámetro el ID de usuario, que debe ser un `number`. El tipo de retorno de `getUserById` es una [Promise](https://www.digitalocean.com/community/tutorials/understanding-the-event-loop-callbacks-promises-and-async-await-in-javascript#promises) que se resuelve en `User` o `null`. Está utilizando el [tipo unión](./how-to-create-custom-types.html#uniones) `User | null` como parámetro de tipo para el genérico `Promise`.
+ 
+`User | null` es la `T` en `Promise<T>`:
+
+
+```ts
+async function getUserById(userId: number): Promise<User | null> {
+```
+
+Llama a tu función usando `await` y almacena el resultado en una variable llamada `user`:
+
+
+```ts
+type User = {
+  id: number;
+  firstName: string;
+};
+
+const users: User[] = [
+  { id: 1, firstName: "Jane" },
+  { id: 2, firstName: "Jon" }
+];
+
+async function getUserById(userId: number): Promise<User | null> {
+  const foundUser = users.find(user => user.id === userId);
+
+  if (!foundUser) {
+    return null;
+  }
+
+  return foundUser;
+}
+
+async function runProgram() {
+  const user = await getUserById(1);
+}
+```
+
+:::tip Nota
+Está utilizando una función contenedora denominada `runProgram` porque no puede utilizar `await` en el nivel superior de un archivo. Si lo hace, el compilador de TypeScript emitirá el error `1375`:
+
+```ts
+Output
+'await' expressions are only allowed at the top level of a file when that file is a module, but this file has no imports or exports. Consider adding an empty 'export {}' to make this file a module. (1375)
+```
+:::
+
+Si pasa el cursor sobre `user` en su editor o en TypeScript Playground, encontrará que `user` tiene el tipo `User | null`, que es exactamente el tipo al que se resuelve la promesa devuelta por su función `getUserById`.
+
+Si elimina el `await` y simplemente llama a la función directamente, se devuelve el objeto `Promise`:
+
+
+```ts
+async function runProgram() {
+  const userPromise = getUserById(1);
+}
+```
+
+Si pasa el cursor sobre `userPromise`, encontrará que tiene el tipo `Promise<User | null>`.
+
+La mayoría de las veces, TypeScript puede inferir el tipo de retorno de su función asíncrona, tal como lo hace con las funciones no asíncronas. Por lo tanto, puede omitir el tipo de retorno de la función `getUserById`, ya que todavía se infiere correctamente que tiene el tipo `Promise<User | null>`:
+
+
+```ts
+async function getUserById(userId: number) {
+  const foundUser = users.find(user => user.id === userId);
+
+  if (!foundUser) {
+    return null;
+  }
+
+  return foundUser;
+}
+```
+
+## Agregar Tipos a Resto de Parámetros
+
+Los [resto de parámetros](https://www.digitalocean.com/community/tutorials/understanding-destructuring-rest-parameters-and-spread-syntax-in-javascript#rest-parameters) son una característica de JavaScript que permite que una función reciba muchos parámetros como una sola matriz. En esta sección, utilizará resto de parámetros con TypeScript.
+
+El uso de resto de parámetros de forma segura es completamente posible usando el resto de parámetros seguido del tipo de la matriz resultante. Tomemos como ejemplo el siguiente código, donde tiene una función llamada `sum` que acepta una cantidad variable de números y devuelve su suma total:
+
+
+```ts{1}
+function sum(...args: number[]) {
+  return args.reduce((accumulator, currentValue) => {
+    return accumulator + currentValue;
+  }, 0);
+}
+```
+
+Esta función usa el [método de Array `.reduce`](https://www.digitalocean.com/community/tutorials/how-to-use-array-methods-in-javascript-iteration-methods) para iterar sobre la matriz y agregar los elementos. Observe el resto de parametros `args` resaltados aquí. El tipo se establece en una matriz de números: `number[]`.
+
+Llamar a su función trabaja normalmente:
+
+
+```ts{7}
+function sum(...args: number[]) {
+  return args.reduce((accumulator, currentValue) => {
+    return accumulator + currentValue;
+  }, 0);
+}
+
+const sumResult = sum(2, 4, 6, 8);
+```
+
+
+Si llama a su función usando algo que no sea un número, como:
+
+
+```ts
+const sumResult = sum(2, "b", 6, 8);
+```
+
+El compilador de TypeScript emitirá el error `2345`:
+
+
+```sh
+Output
+Argument of type 'string' is not assignable to parameter of type 'number'. (2345)
+```
+
+## Usar Sobrecargas de Funciones
+
+Los programadores a veces necesitan una función para aceptar diferentes parámetros dependiendo de cómo se llame a la función. En JavaScript, esto normalmente se hace al tener un parámetro que puede asumir diferentes tipos de valores, como una cadena o un número. Establecer múltiples implementaciones con el mismo nombre de función se denomina _sobrecarga de funciones_.
+
+Con TypeScript, puede crear sobrecargas de funciones que describan explícitamente los diferentes casos que abordan, lo que mejora la experiencia del desarrollador al documentar cada implementación de la función sobrecargada por separado. Esta sección explicará cómo usar la sobrecarga de funciones en TypeScript.
+
+Imagina que tienes un tipo `User`:
+
+
+```ts
+type User = {
+  id: number;
+  email: string;
+  fullName: string;
+  age: number;
+};
+```
+
+Y desea crear una función que pueda buscar un usuario usando cualquiera de la siguiente información:
+
+- `id`
+- `email`
+- `age` y `fullName`
+
+
+Podrías crear una función como esta:
+
+
+```ts
+function getUser(
+  idOrEmailOrAge: number | string,
+  fullName?: string
+): User | undefined {
+  // ... code
+}
+```
+
+Esta función utiliza el operador `|` para componer una unión de tipos para `idOrEmailOrAge` y para el valor de retorno.
+
+A continuación, agregue sobrecargas de función para cada forma en que desee que se use su función, como se muestra en el siguiente código resaltado:
+
+
+```ts{8,9,10}
+type User = {
+  id: number;
+  email: string;
+  fullName: string;
+  age: number;
+};
+
+function getUser(id: number): User | undefined;
+function getUser(email: string): User | undefined;
+function getUser(age: number, fullName: string): User | undefined;
+
+function getUser(
+  idOrEmailOrAge: number | string,
+  fullName?: string
+): User | undefined {
+  // ... code
+}
+```
+
+Esta función tiene tres sobrecargas, una para cada forma de recuperar un usuario. Al crear sobrecargas de funciones, agrega las sobrecargas de funciones antes de la implementación de la función en sí. Las sobrecargas de funciones no tienen cuerpo; solo tienen la lista de parámetros y el tipo de retorno.
+
+
+A continuación, implementa la función en sí, que debe tener una lista de parámetros que sea compatible con todas las sobrecargas de funciones. En el ejemplo anterior, su primer parámetro puede ser un número o una cadena, ya que puede ser el `id`, el `email` o la `age`:
+
+
+```ts
+function getUser(id: number): User | undefined;
+function getUser(email: string): User | undefined;
+function getUser(age: number, fullName: string): User | undefined;
+
+function getUser(
+  idOrEmailOrAge: number | string,
+  fullName?: string
+): User | undefined {
+  // ... code
+}
+```
+
+Por lo tanto, establece el tipo del parámetro `idOrEmailorAge` en la implementación de su función para que sea `number | string`. De esta forma, es compatible con todas las sobrecargas de tu función `getUser`.
+
+También está agregando un parámetro opcional a su función, para cuando el usuario pasa un `fullName`:
+
+La implementación de su función podría ser como la siguiente, donde está utilizando una matriz `users` como el almacén de datos de sus usuarios:
+
+
+```ts{15,19}
+type User = {
+  id: number;
+  email: string;
+  fullName: string;
+  age: number;
+};
+
+const users: User[] = [
+  { id: 1, email: "jane_doe@example.com", fullName: "Jane Doe" , age: 35 },
+  { id: 2, email: "jon_do@example.com", fullName: "Jon Doe", age: 35 }
+];
+
+function getUser(id: number): User | undefined;
+function getUser(email: string): User | undefined;
+function getUser(age: number, fullName: string): User | undefined;
+
+function getUser(
+  idOrEmailOrAge: number | string,
+  fullName?: string
+): User | undefined {
+  if (typeof idOrEmailOrAge === "string") {
+    return users.find(user => user.email === idOrEmailOrAge);
+  }
+
+  if (typeof fullName === "string") {
+    return users.find(user => user.age === idOrEmailOrAge && user.fullName === fullName);
+  } else {
+    return users.find(user => user.id === idOrEmailOrAge);
+  }
+}
+
+const userById = getUser(1);
+const userByEmail = getUser("jane_doe@example.com");
+const userByAgeAndFullName = getUser(35, "Jon Doe");
+```
+
+En este código, si `idOrEmailOrAge` es una cadena, puede buscar al usuario con la clave `email`. El siguiente condicional asume que `idOrEmailOrAge` es un número, por lo que es el `id` o la `age`, dependiendo de si se define `fullName`.
+
+Un aspecto interesante de las sobrecargas de funciones es que en la mayoría de los editores, incluidos VS Code y TypeScript Playground, tan pronto como escriba el nombre de la función y abra el primer paréntesis para llamar a la función, aparecerá una ventana emergente con todas las sobrecargas disponibles. como se muestra en la siguiente imagen:
+
+
+![how-to-use-functions](./img/how-to-use-functions-1.gif)
+
+
+Si agrega un comentario a cada sobrecarga funciones, el comentario también estará en la ventana emergente como fuente de documentación. Por ejemplo, agregue los siguientes comentarios resaltados a las sobrecargas de ejemplo:
+
+
+```ts{2,3,4,6,7,8,10,11,12}
+...
+/**
+ * Get a user by their ID.
+ */
+function getUser(id: number): User | undefined;
+/**
+ * Get a user by their email.
+ */
+function getUser(email: string): User | undefined;
+/**
+ * Get a user by their age and full name.
+ */
+function getUser(age: number, fullName: string): User | undefined;
+...
+```
+
+Ahora, cuando pase el cursor sobre estas funciones, aparecerá el comentario para cada sobrecarga, como se muestra en la siguiente animación:
+
+
+![how-to-use-functions](./img/how-to-use-functions-2.gif)
+
+
+## Guardias de Tipo Definidas por el Usuario
+
+
+La última característica de las funciones en TypeScript que examinará este tutorial son las guardias de tipo definidas por el usuario, que son funciones especiales que permiten a TypeScript inferir mejor el tipo de algún valor. Estas guardias imponen ciertos tipos en bloques de código condicional, donde el tipo de un valor puede ser diferente según la situación. Estos son especialmente útiles cuando se usa la función `Array.prototype.filter` para devolver una matriz de datos filtrada.
+
+Una tarea común al agregar valores condicionalmente a una matriz es verificar algunas condiciones y luego solo agregar el valor si la condición es verdadera. Si el valor no es verdadero, el código agrega un [Booleano](https://www.digitalocean.com/community/tutorials/understanding-data-types-in-javascript) `false` a la matriz. Antes de usar esa matriz, puede filtrarla usando `.filter(Boolean)` para asegurarse de que solo se devuelvan valores verdaderos.
+
+Cuando se llama con un valor, el constructor `Boolean` devuelve `true` o `false`, dependiendo de si este valor es `Truthy` o `Falsy`.
+
+Por ejemplo, imagine que tiene una matriz de cadenas y solo desea incluir la cadena `production` en esa matriz si alguna otra bandera es verdadera:
+
+
+```ts
+const isProduction = false
+
+const valuesArray = ['some-string', isProduction && 'production']
+
+function processArray(array: string[]) {
+  // do something with array
+}
+
+processArray(valuesArray.filter(Boolean))
+```
+
+Si bien esto es, en tiempo de ejecución, un código perfectamente válido, el Compilador de TypeScript le dará el error `2345` durante la compilación:
+
+
+```sh
+Output
+Argument of type '(string | boolean)[]' is not assignable to parameter of type 'string[]'.
+ Type 'string | boolean' is not assignable to type 'string'.
+   Type 'boolean' is not assignable to type 'string'. (2345)
+```
+
+Este error dice que, en tiempo de compilación, el valor pasado a `processArray` se interpreta como una matriz de valores `false | string`, que no es lo que esperaba el `processArray`. Espera una matriz de cadenas: `string[]`.
+
+Este es un caso en el que TypeScript no es lo suficientemente inteligente como para inferir que al usar `.filter(Boolean)` está eliminando todos los valores `falsy` de su matriz. Sin embargo, hay una forma de dar esta sugerencia a TypeScript: usando guardias de tipo definidos por el usuario.
+
+Cree una función de guardia de tipos definida por el usuario llamada `isString`:
+
+
+```ts{1}
+function isString(value: any): value is string {
+  return typeof value === "string"
+}
+```
+
+Observe el tipo de retorno de la función `isString`. La forma de crear guardias de tipo definidas por el usuario es utilizando la siguiente sintaxis como el tipo de retorno de una función:
+
+
+```ts
+parameterName is Type
+```
+
+Donde `parameterName` es el nombre del parámetro que está probando y `Type` es el tipo esperado que tiene el valor de este parámetro si esta función devuelve `true`.
+
+En este caso, está diciendo que `value` es un `string` si `isString` devuelve `true`. También está configurando el tipo de su parámetro `value` en `any`, por lo que funciona con cualquier tipo de valor.
+
+Ahora, cambie su llamada `.filter` para usar su nueva función en lugar de pasarle el constructor `Boolean`:
+
+
+```ts{13}
+const isProduction = false
+
+const valuesArray = ['some-string', isProduction && 'production']
+
+function processArray(array: string[]) {
+  // do something with array
+}
+
+function isString(value: any): value is string {
+  return typeof value === "string"
+}
+
+processArray(valuesArray.filter(isString))
+```
+
+Ahora el compilador de TypeScript infiere correctamente que la matriz pasada a `processArray` solo contiene cadenas y su código se compila correctamente.
+
+## Conclusión
+
+Las funciones son el componente básico de las aplicaciones en TypeScript, y en este tutorial aprendió cómo crear funciones con seguridad de tipos en TypeScript y cómo aprovechar las sobrecargas de funciones para documentar mejor todas las variantes de una sola función. Tener este conocimiento permitirá funciones más seguras y fáciles de mantener en todo el código.
+
 
 
 
