@@ -78,4 +78,139 @@ Ahora cada una de las direcciones tiene un valor de letra que indica a qué dire
 Con la sintaxis de la declaración cubierta, ahora puede consultar el JavaScript subyacente para obtener más información sobre cómo se comportan las enumeraciones, incluida la naturaleza bidireccional de los pares clave/valor.
 
 
-## Bi-directional Enum Members
+## Miembros de Enumeración Bidireccionales
+
+Tras la compilación de TypeScript, las enumeraciones se traducen en objetos de JavaScript. Sin embargo, hay algunas características de las enumeraciones que las diferencian de los objetos. Ofrecen una estructura de datos más estable para almacenar miembros constantes que los objetos de JavaScript tradicionales y también ofrecen referencias bidireccionales para miembros de enumeración. Para mostrar cómo funciona esto, esta sección le mostrará cómo TypeScript compila las enumeraciones en su código final.
+
+Tome la enumeración de cadena que creó en la última sección:
+
+
+```ts
+enum CardinalDirection {
+  North = 'N',
+  East = 'E',
+  South = 'S',
+  West = 'W',
+};
+```
+
+
+Este se convierte en el siguiente código cuando se compila en JavaScript utilizando el compilador de TypeScript:
+
+
+```js
+"use strict";
+var CardinalDirection;
+(function (CardinalDirection) {
+    CardinalDirection["North"] = "N";
+    CardinalDirection["East"] = "E";
+    CardinalDirection["South"] = "S";
+    CardinalDirection["West"] = "W";
+})(CardinalDirection || (CardinalDirection = {}));
+```
+
+En este código, la cadena `"use strict"` inicia el [modo estricto](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Strict_mode), una versión más restrictiva de JavaScript. Después de eso, TypeScript crea una variable `CardinalDirection` sin valor. Luego, el código contiene una [expresión de función de invocación inmediata (IIFE)](https://developer.mozilla.org/en-US/docs/Glossary/IIFE) que toma la variable `CardinalDirection` como argumento, al mismo tiempo que establece su valor en un objeto vacío (`{}`) si aún no se ha establecido.
+
+Dentro de la función, una vez que `CardinalDirection` se establece como un objeto vacío, el código asigna múltiples propiedades a ese objeto:
+
+
+```js{4,5,6,7}
+"use strict";
+var CardinalDirection;
+(function (CardinalDirection) {
+    CardinalDirection["North"] = "N";
+    CardinalDirection["East"] = "E";
+    CardinalDirection["South"] = "S";
+    CardinalDirection["West"] = "W";
+})(CardinalDirection || (CardinalDirection = {}));
+```
+
+
+Tenga en cuenta que cada propiedad es un miembro de su enumeración original, con los valores establecidos en el valor del miembro de la enumeración.
+
+Para las enumeraciones de cadenas, este es el final del proceso. Pero a continuación, intentará lo mismo con la enumeración numérica de la última sección:
+
+
+```ts
+enum CardinalDirection {
+  North = 1,
+  East,
+  South,
+  West,
+};
+```
+
+Esto dará como resultado el siguiente código, con las secciones resaltadas agregadas:
+
+
+```js{4,5,6,7}
+"use strict";
+var CardinalDirection;
+(function (CardinalDirection) {
+    CardinalDirection[CardinalDirection["North"] = 1] = "North";
+    CardinalDirection[CardinalDirection["East"] = 2] = "East";
+    CardinalDirection[CardinalDirection["South"] = 3] = "South";
+    CardinalDirection[CardinalDirection["West"] = 4] = "West";
+})(CardinalDirection || (CardinalDirection = {}));
+```
+
+Además de que cada miembro de la enumeración se convierte en una propiedad del objeto (`CardinalDirection["North"] = 1]`), la enumeración también crea una clave para cada número y asigna la cadena como valor. En el caso de `North`, `CardinalDirection["North"] = 1` devuelve el valor `1`, y `CardinalDirection[1] = "North"` asigna el valor `"North"` a la clave `"1"`.
+
+Esto permite una relación bidireccional entre los nombres de los miembros numéricos y sus valores. Para probar esto, registre lo siguiente:
+
+
+```ts
+console.log(CardinalDirection.North)
+```
+
+Esto devolverá el valor de la tecla `"North"`:
+
+
+```sh
+Output
+1
+```
+
+A continuación, ejecute el siguiente código para invertir la dirección de la referencia:
+
+
+```ts
+console.log(CardinalDirection[1])
+```
+
+La salida será:
+
+
+```sh
+Output
+"North"
+```
+
+Para ilustrar el objeto final que representa la enumeración, registre la enumeración completa en la consola:
+
+
+```ts
+console.log(CardinalDirection)
+```
+
+Esto mostrará los dos conjuntos de pares clave/valor que crean el efecto de bidireccionalidad:
+
+
+```sh
+Output
+{
+  "1": "North",
+  "2": "East",
+  "3": "South",
+  "4": "West",
+  "North": 1,
+  "East": 2,
+  "South": 3,
+  "West": 4
+} 
+```
+
+Con una comprensión de cómo funcionan las enumeraciones bajo el capó en TypeScript, ahora pasará a usar enumeraciones para declarar tipos en su código.
+
+
+## Using Enums in TypeScript
