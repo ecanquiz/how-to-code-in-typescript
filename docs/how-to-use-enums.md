@@ -213,4 +213,89 @@ Output
 Con una comprensión de cómo funcionan las enumeraciones bajo el capó en TypeScript, ahora pasará a usar enumeraciones para declarar tipos en su código.
 
 
-## Using Enums in TypeScript
+## Usando Enumeraciones en TypeScript
+
+En esta sección, probará la sintaxis básica de asignar miembros de enumeración como tipos en su código TypeScript. Esto se puede hacer de la misma manera que se declaran los [tipos básicos](./how-to-use-basic-types.html).
+
+Para usar su enumeración `CardinalDirection` como el tipo de una variable en TypeScript, puede usar el nombre de la enumeración, como se muestra en el siguiente código resaltado:
+
+
+```ts{8}
+enum CardinalDirection {
+  North = 'N',
+  East = 'E',
+  South = 'S',
+  West = 'W',
+};
+
+const direction: CardinalDirection = CardinalDirection.North;
+```
+
+Observe que está configurando la variable para que tenga la enumeración como su tipo:
+
+
+```ts
+const direction: CardinalDirection = CardinalDirection.North;
+```
+
+También está configurando el valor de la variable para que sea uno de los miembros de la enumeración, en este caso `CardinalDirection.North`. Puede hacer esto porque las enumeraciones se compilan en objetos de JavaScript, por lo que también tienen una representación de valor además de ser tipos.
+
+Si pasa un valor que no es compatible con el tipo de enumeración de su variable `direction`, así:
+
+
+```ts
+const direction: CardinalDirection = false;
+```
+
+El compilador de TypeScript mostrará el error `2322`:
+
+
+```sh
+Output
+Type 'false' is not assignable to type 'CardinalDirection'. (2322)
+```
+
+Por lo tanto, `direction` solo se puede establecer en un miembro de la enumeración `CardinalDirection`.
+
+También puede establecer el tipo de su variable en un miembro de enumeración específico:
+
+
+```ts{8}
+enum CardinalDirection {
+  North = 'N',
+  East = 'E',
+  South = 'S',
+  West = 'W',
+};
+
+const direction: CardinalDirection.North = CardinalDirection.North;
+```
+
+En este caso, la variable solo se puede asignar al miembro `North` de la enumeración `CardinalDirection`.
+
+Si los miembros de su enumeración tienen valores numéricos, también puede establecer el valor de su variable en esos valores numéricos. Por ejemplo, dada la enumeración:
+
+
+```ts
+enum CardinalDirection {
+  North = 1,
+  East,
+  South,
+  West,
+};
+```
+
+Puede establecer el valor de una variable de tipo `CardinalDirection` en `1`:
+
+
+```ts
+const direction: CardinalDirection = 1;
+```
+
+
+Esto es posible porque `1` es el valor del miembro `North` de su enumeración `CardinalDirection`. Esto solo funciona para los miembros numéricos de la enumeración y se basa en la relación bidireccional que tiene el JavaScript compilado para los miembros numéricos de la enumeración, que se trata en la última sección.
+
+Ahora que ha intentado declarar tipos de variables con valores de enumeración, la siguiente sección demostrará una forma específica de manipular enumeraciones: extraer el tipo de objeto subyacente.
+
+
+## Extracting the Object Type of Enums
