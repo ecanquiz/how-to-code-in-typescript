@@ -298,4 +298,73 @@ Esto es posible porque `1` es el valor del miembro `North` de su enumeración `C
 Ahora que ha intentado declarar tipos de variables con valores de enumeración, la siguiente sección demostrará una forma específica de manipular enumeraciones: extraer el tipo de objeto subyacente.
 
 
-## Extracting the Object Type of Enums
+## Extraer el Tipo de Objeto de las Enumeraciones
+
+En las secciones anteriores, descubrió que las enumeraciones no son solo una extensión de nivel de tipo en la parte superior JavaScript, sino que tienen valores reales. Esto también significa que la estructura de datos de la enumeración en sí tiene un tipo, que deberá tener en cuenta si intenta establecer un objeto JavaScript que represente una instancia de la enumeración. Para hacer esto, deberá extraer el tipo de la representación del objeto enumerado en sí.
+
+Dada su enumeración `CardinalDirection`:
+
+
+```ts
+enum CardinalDirection {
+  North = 'N',
+  East = 'E',
+  South = 'S',
+  West = 'W',
+};
+```
+
+
+Trate de crear un objeto que coincida con su enumeración, como el siguiente:
+
+
+```ts
+enum CardinalDirection {
+  North = 'N',
+  East = 'E',
+  South = 'S',
+  West = 'W',
+};
+
+const test1: CardinalDirection = {
+  North: CardinalDirection.North,
+  East: CardinalDirection.East,
+  South: CardinalDirection.South,
+  West: CardinalDirection.West,
+}
+```
+
+En este código, `test1` es un objeto de tipo `CardinalDirection` y el valor del objeto incluye todos los miembros de la enumeración. Sin embargo, el compilador de TypeScript mostrará el error `2322`:
+
+
+```sh
+Output
+Type '{ North: CardinalDirection; East: CardinalDirection; South: CardinalDirection; West: CardinalDirection; }' is not assignable to type 'CardinalDirection'.
+```
+
+El motivo de este error es que el tipo `CardinalDirection` representa un tipo de unión de todos los miembros de la enumeración, no el tipo del objeto de enumeración en sí. Puede extraer el tipo de objeto usando `typeof` antes del nombre de la enumeración. Compruebe el código resaltado a continuación:
+
+
+```ts
+enum CardinalDirection {
+  North = 'N',
+  East = 'E',
+  South = 'S',
+  West = 'W',
+};
+
+const test1: typeof CardinalDirection = {
+  North: CardinalDirection.North,
+  East: CardinalDirection.East,
+  South: CardinalDirection.South,
+  West: CardinalDirection.West,
+}
+```
+
+El compilador de TypeScript ahora podrá compilar su código correctamente.
+
+Esta sección mostró una forma específica de ampliar el uso de las enumeraciones. A continuación, trabajará en un caso de uso en el que se aplican las enumeraciones: indicadores de bits en el desarrollo de juegos.
+
+
+## Using Bit Flags with TypeScript Enums
+
