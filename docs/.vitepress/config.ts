@@ -21,12 +21,17 @@ export default defineConfig({
         { text: 'Cómo Usar Tipos Básicos', link: '/how-to-use-basic-types' },
         { text: 'Cómo Crear Tipos Personalizados', link: '/how-to-create-custom-types' },
         { text: 'Cómo Usar Funciones', link: '/how-to-use-functions' },
-        { text: 'Cómo Usar Enumeraciones', link: '/how-to-use-enums' },                   
+        { text: 'Cómo Usar Enumeraciones', link: '/how-to-use-enums' },     
+        { text: 'Cómo Usar Clases', link: '/how-to-use-classes' },              
       ]
     }],
     socialLinks: [
       { icon: 'github', link: 'https://github.com/ecanquiz/how-to-code-in-typescript' }
-    ]
+    ],
+    footer: {
+      message: 'Released under the MIT License.',
+      copyright: 'Copyright © 2023-present Ernesto Canquiz'
+    } 
   }
 })
 

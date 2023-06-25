@@ -10,7 +10,7 @@ En [TypeScript](https://www.typescriptlang.org/), las _enumeraciones_ o tipos en
 
 Mientras que la mayoría de las funciones de TypeScript son útiles para generar errores durante la compilación, las enumeraciones también son útiles como estructuras de datos que pueden contener constantes para su código. TypeScript traduce enumeraciones en [objetos JavaScript](https://www.digitalocean.com/community/tutorials/understanding-objects-in-javascript) en el código final emitido por el compilador. Debido a esto, puede usar enumeraciones para hacer que una base de código sea más legible, ya que puede tener múltiples valores constantes agrupados en la misma estructura de datos, al mismo tiempo que hace que el código sea más seguro para los tipos que simplemente tener diferentes variables `const` por ahí.
 
-Este tutorial explicará la sintaxis que se usa para crear tipos de enumeración, el código JavaScript que el compilador de TypeScript crea bajo el capó, cómo extraer el tipo de objeto de enumeración y un caso de uso para enumeraciones que involucra indicadores de bits en el desarrollo de juegos.
+Este tutorial explicará la sintaxis que se usa para crear tipos de enumeración, el código JavaScript que el compilador de TypeScript crea bajo el capó, cómo extraer el tipo de objeto de enumeración y un caso de uso para enumeraciones que involucra banderas de bits en el desarrollo de juegos.
 
 ## Creando Enumeraciones en TypeScript
 
@@ -363,8 +363,123 @@ const test1: typeof CardinalDirection = {
 
 El compilador de TypeScript ahora podrá compilar su código correctamente.
 
-Esta sección mostró una forma específica de ampliar el uso de las enumeraciones. A continuación, trabajará en un caso de uso en el que se aplican las enumeraciones: indicadores de bits en el desarrollo de juegos.
+Esta sección mostró una forma específica de ampliar el uso de las enumeraciones. A continuación, trabajará en un caso de uso en el que se aplican las enumeraciones: banderas de bits en el desarrollo de juegos.
 
 
-## Using Bit Flags with TypeScript Enums
+## Usando Banderas de Bits con Enumeraciones de TypeScript
 
+En esta última sección del tutorial, analizará un caso de uso tangible para enumeraciones en TypeScript: [banderas de bits](https://en.wikipedia.org/wiki/Bit_field).
+
+Las banderas de bits son una forma de representar diferentes opciones de tipo booleano en una sola variable, mediante el uso de [operaciones _bitwise_](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators#binary_bitwise_operators). Para que esto funcione, cada bandera debe usar exactamente un bit de un número de 32 bits, ya que este es el valor máximo permitido por JavaScript al realizar operaciones _bitwise_. El número máximo de 32 bits es `2,147,483,647`, que en binario es `11111111111111111111111111111111`, por lo que tiene `31` banderas posibles.
+
+
+Imagina que estás creando un juego y el jugador puede tener diferentes habilidades, como `SKILL_A`, `SKILL_B` y `SKILL_C`. Para asegurarse de que su programa sepa cuándo un jugador tiene cierta habilidad, puede crear banderas que se puedan activar o desactivar, según el estado del jugador.
+
+Con el siguiente pseudocódigo, asigne a cada bandera de habilidad un valor binario:
+
+
+```ts
+SKILL_A = 0000000000000000000000000000001
+SKILL_B = 0000000000000000000000000000010
+SKILL_C = 0000000000000000000000000000100
+```
+
+Ahora puede almacenar todas las habilidades actuales del jugador en una sola variable, utilizando el operador _bitwise_ `|` (O):
+
+
+```ts
+playerSkills = SKILL_A | SKILL_B
+```
+
+En este caso, asignando a un jugador la bandera de bits `0000000000000000000000000000001` y la bandera de bits `0000000000000000000000000000010` con el `|` operador producirá `0000000000000000000000000000011`, que representará que el jugador tiene ambas habilidades.
+
+También puede agregar más habilidades:
+
+
+```ts
+playerSkills |= SKILL_C
+```
+
+Esto producirá `0000000000000000000000000000111` para indicar que el jugador tiene las tres habilidades.
+
+También puede eliminar una habilidad usando una combinación de los operadores _bitwise_ `&` (_AND_) y `~` (_NOT_):
+
+
+```ts
+playerSkills &= ~SKILL_C
+```
+
+Luego, para verificar si el jugador tiene una habilidad específica, usa el operador _bitwise_ `&` (_AND_):
+
+
+```ts
+hasSkillC = (playerSkills & SKILL_C) == SKILL_C
+```
+
+Si el jugador no tiene la habilidad `SKILL_C`, la parte `(playerSkills & SKILL_C)` se evaluará a `0`. De lo contrario, `(playerSkills & SKILL_C)` se evaluará al valor exacto de la habilidad que está probando, que en este caso es `SKILL_C` (`00000000000000000000000000000010`). De esta manera, puede probar que el valor evaluado es el mismo que el valor de la habilidad con la que lo está probando.
+
+Como TypeScript le permite establecer el valor de los miembros de la enumeración en números enteros, puede almacenar esas banderas como una enumeración:
+
+
+```ts
+enum PlayerSkills {
+  SkillA = 0b0000000000000000000000000000001,
+  SkillB = 0b0000000000000000000000000000010,
+  SkillC = 0b0000000000000000000000000000100,
+  SkillD = 0b0000000000000000000000000001000,
+};
+```
+
+Puede usar el prefijo `0b` para representar números binarios directamente. Si no desea utilizar representaciones binarias tan grandes, puede utilizar el operador _bitwise_ `<<` (desplazamiento a la izquierda):
+
+
+```ts
+enum PlayerSkills {
+  SkillA = 1 << 0,
+  SkillB = 1 << 1,
+  SkillC = 1 << 2,
+  SkillD = 1 << 3,
+};
+```
+
+`1 << 0` evaluará a `0b0000000000000000000000000000001`, `1 << 1` a `0b000000000000000000000000000010`, `1 << 2` a `0b00000000000000000000000000000100`, y `1 << 3` a `0b00000000000000000000000000001000`.
+
+Ahora puedes declarar tu variable `playerSkills` así:
+
+
+```ts
+let playerSkills: PlayerSkills = PlayerSkills.SkillA | PlayerSkills.SkillB;
+```
+
+:::tip Nota
+Debe configurar explícitamente el tipo de la variable `playerSkills` para que sea `PlayerSkills`, de lo contrario, TypeScript inferirá que es del tipo `number`.
+:::
+
+
+Para agregar más habilidades, usaría la siguiente sintaxis:
+
+
+```ts
+playerSkills |= PlayerSkills.SkillC;
+```
+
+También puedes eliminar una habilidad:
+
+
+```ts
+playerSkills &= ~PlayerSkills.SkillC;
+```
+
+Finalmente, puede verificar si el jugador tiene alguna habilidad dada usando su enumeración:
+
+
+```ts
+const hasSkillC = (playerSkills & PlayerSkills.SkillC) === PlayerSkills.SkillC;
+```
+
+Si bien todavía usa banderas de bits debajo del capó, esta solución proporciona una forma más legible y organizada de mostrar los datos. También hace que su código sea más seguro para los tipos al almacenar los valores binarios como constantes en una enumeración y generar errores si la variable `playerSkills` no coincide con un bandera de bit.
+
+
+## Conclusión
+
+Las enumeraciones son una estructura de datos común en la mayoría de los lenguajes que proporcionan un sistema de tipos, y esto no es diferente en TypeScript. En este tutorial, creó y usó enumeraciones en TypeScript, mientras también atravesó algunos escenarios más avanzados, como extraer el tipo de objeto de una enumeración y usar banderas de bits. Con las enumeraciones, puede hacer que su base de código sea más legible, al mismo tiempo que organiza las constantes en una estructura de datos en lugar de dejarlas en el espacio global.
