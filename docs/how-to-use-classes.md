@@ -99,4 +99,148 @@ filename.ts(4, 15): An argument for 'name' was not provided.
 Ahora que ha declarado una clase en TypeScript, pasará a manipular esas clases agregando propiedades.
 
 
-## Adding Class Properties
+## Agregar Propiedades de Clase
+
+Uno de los aspectos más útiles de las clases es su capacidad para contener datos internos de cada instancia creada a partir de la clase. Esto se hace usando _propiedades_.
+
+TypeScript tiene algunas comprobaciones de seguridad que diferencian este proceso de las clases de JavaScript, incluido el requisito de inicializar las propiedades para evitar que sean `undefined`. En esta sección, agregará nuevas propiedades a su clase para ilustrar estas comprobaciones de seguridad.
+
+Con TypeScript, generalmente debe declarar la propiedad primero en el cuerpo de la clase y darle un tipo. Por ejemplo, agregue una propiedad `name` a su clase `Person`:
+
+
+```ts{2,5}
+class Person {
+  name: string;
+
+  constructor(name: string) {
+    this.name = name;
+  }
+}
+```
+
+En este ejemplo, declara la propiedad `name` con tipo `string` además de establecer la propiedad en el `constructor`.
+
+
+:::tip Nota
+En TypeScript, también puede declarar la _visibilidad_ de las propiedades en una clase para determinar dónde se puede acceder a los datos. En la declaración `name: string`, no se declara la visibilidad, lo que significa que la propiedad utiliza el estatus `public` predeterminado al que se puede acceder desde cualquier lugar. Si quisiera controlar la visibilidad explícitamente, pondría declare esto con la propiedad. Esto se tratará con más profundidad más adelante en el tutorial.
+:::
+
+
+También puede dar un valor predeterminado a una propiedad. Como ejemplo, agregue una nueva propiedad llamada `instantiatedAt` que se establecerá en el momento en que se instancia la instancia de la clase:
+
+
+```ts{3}
+class Person {
+  name: string;
+  instantiatedAt = new Date();
+
+  constructor(name: string) {
+    this.name = name;
+  }
+}
+```
+
+Esto usa el [objeto `Date`](https://www.digitalocean.com/community/tutorials/understanding-date-and-time-in-javascript) para establecer una fecha inicial para la creación de la instancia. Este código funciona porque el código para el valor predeterminado se ejecuta cuando se llama al constructor de la clase, lo que sería equivalente a establecer el valor en el constructor, como se muestra a continuación:
+
+```ts
+class Person {
+  name: string;
+  instantiatedAt: Date;
+
+  constructor(name: string) {
+    this.name = name;
+    this.instantiatedAt = new Date();
+  }
+}
+```
+
+Al declarar el valor predeterminado en el cuerpo de la clase, no necesita establecer el valor en el constructor.
+
+Tenga en cuenta que si establece un tipo para una propiedad en una clase, también debe inicializar esa propiedad en un valor de ese tipo. Para ilustrar esto, declare una propiedad de clase pero no proporcione un inicializador, como en el siguiente código:
+
+
+```ts
+class Person {
+  name: string;
+  instantiatedAt: Date;
+
+  constructor(name: string) {
+    this.name = name;
+  }
+}
+```
+
+
+`instanciatedAt` tiene asignado un tipo de `Date`, por lo que siempre debe ser un objeto `Date`. Pero como no hay inicialización, la propiedad se vuelve `undefined` cuando se instancia la clase. Debido a esto, el Compilador de TypeScript mostrará el error `2564`:
+
+
+```sh
+Output
+Property 'instantiatedAt' has no initializer and is not definitely assigned in the constructor. (2564)
+```
+
+Esta es una verificación de seguridad adicional de TypeScript para garantizar que las propiedades correctas estén presentes en la creación de instancias de clase.
+
+
+TypeScript también tiene un atajo para escribir propiedades que tienen el mismo nombre que los parámetros pasados al constructor. Este atajo se llama _propiedades de parámetro_.
+
+
+En el ejemplo anterior, establece la propiedad `name` en el valor del parámetro `name` pasado al constructor de la clase. Esto puede volverse tedioso de escribir si agrega más campos a su clase. Por ejemplo, agregue un nuevo campo llamado `age` de tipo `number` a su clase `Person` y también agréguelo al constructor:
+
+
+```ts{3,8}
+class Person {
+  name: string;
+  age: number;
+  instantiatedAt = new Date();
+
+  constructor(name: string, age: number) {
+    this.name = name;
+    this.age = age;
+  }
+}
+```
+
+Si bien esto funciona, TypeScript puede reducir dicho código repetitivo con propiedades de parámetros o propiedades establecidas en los parámetros para el constructor:
+
+
+```ts{5,6}
+class Person {
+  instantiatedAt = new Date();
+
+  constructor(
+    public name: string,
+    public age: number
+  ) {}
+}
+```
+
+En este fragmento, eliminó las declaraciones de propiedad `name` y `age` del cuerpo de la clase y las movió para que estuvieran dentro de la lista de parámetros del constructor. Cuando hace eso, le está diciendo a TypeScript que esos parámetros del constructor también son propiedades de esa clase. De esta manera, no necesita establecer la propiedad de la clase en el valor del parámetro recibido en el constructor, como lo hizo antes.
+
+
+:::tip Nota
+Observe que el modificador de visibilidad `public` se ha establecido explícitamente en el código. Este modificador debe incluirse al establecer las propiedades de los parámetros y no pasará automáticamente a la visibilidad `public` de forma predeterminada.
+:::
+
+
+Si echa un vistazo al JavaScript compilado emitido por el Compilador de TypeScript, este código se compila en el siguiente código JavaScript:
+
+
+```js
+"use strict";
+class Person {
+  constructor(name, age) {
+    this.name = name;
+    this.age = age;
+    this.instantiatedAt = new Date();
+  }
+}
+```
+
+Este es el mismo código JavaScript en el que se compila el ejemplo original.
+
+Ahora que ha probado la configuración de propiedades en las clases de TypeScript, puede pasar a ampliar las clases a nuevas clases con herencia de clases.
+
+
+## Class Inheritance in TypeScript
+
