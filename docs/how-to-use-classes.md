@@ -675,4 +675,112 @@ Recuerde que TypeScript se compila en JavaScript sin procesar que, por sí mismo
 
 Ahora que ha probado los modificadores de visibilidad, puede pasar a las funciones de flecha como métodos en las clases de TypeScript.
 
-## Class Methods as Arrow Functions
+## Métodos de Clase como Funciones de Flecha
+
+En JavaScript, el valor [`this`](https://www.digitalocean.com/community/conceptual-articles/understanding-this-bind-call-and-apply-in-javascript) que representa el contexto de una función puede cambiar dependiendo de cómo se llame a una función. Esta variabilidad a veces puede ser confusa en piezas de código complejas. Cuando trabaje con TypeScript, puede usar una sintaxis especial al crear métodos de clase para evitar que se vincule a otra cosa que no sea la instancia de la clase. En esta sección, probará esta sintaxis.
+
+Usando su clase `Employee`, introduzca un nuevo método usado solo para recuperar el identificador de empleado:
+
+
+```ts{6,7,8}
+class Employee {
+  constructor(
+    protected identifier: string
+  ) {}
+
+  getIdentifier() {
+    return this.identifier;
+  }
+}
+```
+
+Esto funciona bastante bien si llamas al método directamente:
+
+
+```ts{11,13}
+class Employee {
+  constructor(
+    protected identifier: string
+  ) {}
+
+  getIdentifier() {
+    return this.identifier;
+  }
+}
+
+const employee = new Employee("abc-123");
+
+console.log(employee.getIdentifier());
+```
+
+Esto imprimiría lo siguiente en la salida de la consola:
+
+
+```sh
+Output
+abc-123
+```
+
+
+Sin embargo, si almacenó el método de instancia `getIdentifier` en algún lugar para llamarlo más tarde, como en el siguiente código:
+
+
+```ts{13,14,15,17}
+class Employee {
+  constructor(
+    protected identifier: string
+  ) {}
+
+  getIdentifier() {
+    return this.identifier;
+  }
+}
+
+const employee = new Employee("abc-123");
+
+const obj = {
+  getId: employee.getIdentifier
+}
+
+console.log(obj.getId());
+```
+
+El valor sería inaccesible:
+
+
+```sh
+Output
+undefined
+```
+
+Esto sucede porque cuando llama a `obj.getId()`, el `this` dentro de `employee.getIdentifier` ahora está vinculado al objeto `obj`, y no a la instancia `Employee`.
+
+
+Puede evitar esto cambiando su `getIdentifier` para que sea una [función de flecha](https://www.digitalocean.com/community/tutorials/understanding-arrow-functions-in-javascript). Compruebe el cambio resaltado en el siguiente código:
+
+
+```ts
+class Employee {
+  constructor(
+    protected identifier: string
+  ) {}
+
+  getIdentifier = () => {
+    return this.identifier;
+  }
+}
+...
+```
+
+Si ahora intenta llamar a `obj.getId()` como lo hizo antes, la consola muestra correctamente:
+
+
+```sh
+Output
+abc-123
+```
+
+Esto demuestra cómo TypeScript le permite usar funciones de flecha como valores directos de métodos de clase. En la siguiente sección, aprenderá cómo hacer cumplir las clases con la verificación de tipos de TypeScript.
+
+
+## Using Classes as Types
