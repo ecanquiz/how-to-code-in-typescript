@@ -22,7 +22,8 @@ export default defineConfig({
         { text: 'Cómo Crear Tipos Personalizados', link: '/how-to-create-custom-types' },
         { text: 'Cómo Usar Funciones', link: '/how-to-use-functions' },
         { text: 'Cómo Usar Enumeraciones', link: '/how-to-use-enums' },     
-        { text: 'Cómo Usar Clases', link: '/how-to-use-classes' },              
+        { text: 'Cómo Usar Clases', link: '/how-to-use-classes' },
+        { text: 'Cómo Usar Decoradores', link: '/how-to-use-decorators' },
       ]
     }],
     socialLinks: [

@@ -28,6 +28,8 @@ features:
     details: En TypeScript, las enumeraciones o tipos enumerados son estructuras de datos de longitud constante que contienen un conjunto de valores constantes. Cada uno de estos valores constantes se conoce como miembro de la enumeración. Las enumeraciones son útiles cuando se establecen propiedades o valores que solo pueden ser una cierta cantidad de valores posibles. Este tutorial explicará la sintaxis utilizada para crear tipos de enumeración, el código JavaScript que el compilador de TypeScript crea bajo el capó y un caso de uso para enumeraciones en el desarrollo de juegos.
   - title: Cómo Usar Clases en TypeScript
     details: Las clases son una abstracción común utilizada en los lenguajes de programación orientada a objetos (POO) para describir estructuras de datos conocidas como objetos. TypeScript tiene soporte completo para la sintaxis de clase y también agrega características, como visibilidad de miembros, clases abstractas, clases genéricas, métodos de función de flecha y algunos otros. Este tutorial repasará la sintaxis utilizada para crear clases, las diferentes funciones disponibles y cómo se tratan las clases en TypeScript durante la verificación de tipos en tiempo de compilación.
+  - title: Cómo Usar Decoradores en TypeScript
+    details: Los decoradores son una forma de decorar miembros de una clase, o una clase en sí misma, con funcionalidad adicional. Este tutorial cubre la creación de decoradores en TypeScript para clases y miembros de clase, y también cómo usarlos.
     
 footer: MIT Licensed | Copyleft © 2023-present Ernesto Canquiz
 ---
