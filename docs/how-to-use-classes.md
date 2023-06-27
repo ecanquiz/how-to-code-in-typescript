@@ -484,3 +484,76 @@ En esta sección, examinará los modificadores de visibilidad disponibles y apre
 ## `public`
 
 
+Esta es la visibilidad predeterminada de los miembros de la clase en TypeScript. Cuando no agrega el modificador de visibilidad a un miembro de la clase, es lo mismo que configurarlo como `public`. Se puede acceder a los miembros de la clase pública desde cualquier lugar, sin restricciones.
+
+Para ilustrar esto, regrese a su clase `Person` de antes:
+
+
+```ts
+class Person {
+  public instantiatedAt = new Date();
+
+  constructor(
+    name: string,
+    age: number
+  ) {}
+}
+```
+
+
+Este tutorial mencionó que las dos propiedades `name` y `age` tenían visibilidad `public` de forma predeterminada. Para declarar explícitamente la visibilidad del tipo, agregue la palabra clave `public` antes de las propiedades y un nuevo método `public` a su clase llamado `getBirthYear`, que recupera el año de nacimiento de la instancia `Person`:
+
+
+```ts{3,4,7,8,9}
+class Person {
+  constructor(
+    public name: string,
+    public age: number
+  ) {}
+
+  public getBirthYear() {
+    return new Date().getFullYear() - this.age;
+  }
+}
+```
+
+
+Luego puede usar las propiedades y los métodos en el espacio global, fuera de la instancia de la clase:
+
+
+```ts
+class Person {
+  constructor(
+    public name: string,
+    public age: number
+  ) {}
+
+  public getBirthYear() {
+    return new Date().getFullYear() - this.age;
+  }
+}
+
+const jon = new Person("Jon", 35);
+
+console.log(jon.name);
+console.log(jon.age);
+console.log(jon.getBirthYear());
+```
+
+
+Este código imprimiría lo siguiente en la consola:
+
+
+
+```sh
+Output
+Jon
+35
+1986
+```
+
+
+Tenga en cuenta que puede acceder a todos los miembros de su clase.
+
+
+## `protected`
