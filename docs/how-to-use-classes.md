@@ -349,4 +349,125 @@ Property 'debug' in type 'ConsoleLogger' is not assignable to the same property 
       Type 'string' is not assignable to type 'number'. (2416)
 ```
 
-## Building on Abstract Classes
+## Construyendo sobre Clases Abstractas
+
+Las clases abstractas son similares a las clases normales, con dos diferencias principales: no se pueden instanciar directamente y pueden contener _miembros abstractos_. Los miembros abstractos son miembros que deben implementarse en las clases heredadas. No tienen una implementación en la propia clase abstracta. Esto es útil porque puede tener alguna funcionalidad común en la clase abstracta base e implementaciones más específicas en las clases heredadas. Cuando marca una clase como abstracta, está diciendo que a esta clase le falta una funcionalidad que debería implementarse en las clases heredadas.
+
+Para crear una clase abstracta, agrega la palabra clave `abstract` antes de la palabra clave `class`, como en el código resaltado:
+
+
+```ts{1}
+abstract class AbstractClassName {
+
+}
+```
+
+A continuación, puede crear miembros en su clase abstracta, algunos que pueden tener una implementación y otros que no. Los que no tienen implementación se marcan como `abstract` y luego deben implementarse en las clases que se extienden desde su clase abstracta.
+
+Por ejemplo, imagine que está trabajando en un entorno [Node.js](https://www.digitalocean.com/community/tutorial_series/how-to-code-in-node-js) y está creando su propia [implementación `Stream`](https://nodejs.dev/learn/nodejs-streams). Para eso, vas a tener una clase abstracta llamada `Stream` con dos métodos abstractos, `read` y `write`:
+
+
+```ts
+declare class Buffer {
+  from(array: any[]): Buffer;
+  copy(target: Buffer, offset?: number): void;
+}
+
+abstract class Stream {
+
+  abstract read(count: number): Buffer;
+  
+  abstract write(data: Buffer): void;
+}
+```
+
+El [objeto `Buffer`](https://www.digitalocean.com/community/tutorials/using-buffers-in-node-js) aquí es una clase disponible en Node.js que se usa para almacenar datos binarios. La instrucción `declare class Buffer` en la parte superior permite que el código se compile en un entorno de TypeScript sin las declaraciones de tipo de Node.js, como TypeScript Playground.
+
+
+En este ejemplo, el método `read` cuenta los bytes de la estructura de datos interna y devuelve un objeto `Buffer`, y `write` escribe todo el contenido de la instancia `Buffer` en la secuencia. Ambos métodos son abstractos y solo se pueden implementar en clases extendidas de `Stream`.
+
+A continuación, puede crear métodos adicionales que tengan una implementación. De esta manera, cualquier clase que se extienda desde su clase abstracta `Stream` recibiría esos métodos automáticamente. Un ejemplo sería un método `copy`:
+
+
+```ts{12,13,14,15}
+declare class Buffer {
+  from(array: any[]): Buffer;
+  copy(target: Buffer, offset?: number): void;
+}
+
+abstract class Stream {
+
+  abstract read(count: number): Buffer;
+  
+  abstract write(data: Buffer): void;
+
+  copy(count: number, targetBuffer: Buffer, targetBufferOffset: number) {
+    const data = this.read(count);
+    data.copy(targetBuffer, targetBufferOffset);
+  }
+}
+```
+
+Este método `copy` copia el resultado de leer los bytes de la secuencia en `targetBuffer`, comenzando en `targetBufferOffset`.
+
+Si luego crea una implementación para su clase abstracta `Stream`, como una clase `FileStream`, el método `copy` estará fácilmente disponible, sin tener que duplicarlo en su clase `FileStream`:
+
+
+```ts{18,19,20,21,22,23,24,25,26,27,29}
+declare class Buffer {
+  from(array: any[]): Buffer;
+  copy(target: Buffer, offset?: number): void;
+}
+
+abstract class Stream {
+
+  abstract read(count: number): Buffer;
+  
+  abstract write(data: Buffer): void;
+
+  copy(count: number, targetBuffer: Buffer, targetBufferOffset: number) {
+    const data = this.read(count);
+    data.copy(targetBuffer, targetBufferOffset);
+  }
+}
+
+class FileStream extends Stream {
+  read(count: number): Buffer {
+    // implementation here
+    return new Buffer();
+  }
+  
+  write(data: Buffer) {
+    // implementation here
+  }
+}
+
+const fileStream = new FileStream();
+```
+
+En este ejemplo, la instancia `fileStream` automáticamente tiene disponible el método `copy`. La clase `FileStream` también tuvo que implementar un método `read` y un `write` explícitamente para adherirse a la clase abstracta `Stream`.
+
+
+Si olvidó implementar uno de los miembros abstractos de la clase abstracta de la que se está extendiendo, como no agregar la implementación `write` en su clase `FileStream`, el compilador de TypeScript arrojaría el error `2515`:
+
+
+```sh
+Output
+Non-abstract class 'FileStream' does not implement inherited abstract member 'write' from class 'Stream'. (2515)
+```
+
+El compilador de TypeScript también mostraría un error si implementara alguno de los miembros incorrectamente, como cambiar el tipo del primer parámetro del método `write` para que sea de tipo `string` en lugar de `Buffer`:
+
+
+```sh
+Output
+Property 'write' in type 'FileStream' is not assignable to the same property in base type 'Stream'.
+  Type '(data: string) => void' is not assignable to type '(data: Buffer) => void'.
+    Types of parameters 'data' and 'data' are incompatible.
+      Type 'Buffer' is not assignable to type 'string'. (2416)
+```
+
+Con las clases e interfaces abstractas, puede realizar comprobaciones de tipos más complejas para sus clases a fin de asegurarse de que las clases extendidas a partir de las clases base hereden la funcionalidad correcta. A continuación, verá ejemplos de cómo funciona la visibilidad de métodos y propiedades en TypeScript.
+
+
+## Class Members Visibility
