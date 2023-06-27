@@ -242,5 +242,111 @@ Este es el mismo código JavaScript en el que se compila el ejemplo original.
 Ahora que ha probado la configuración de propiedades en las clases de TypeScript, puede pasar a ampliar las clases a nuevas clases con herencia de clases.
 
 
-## Class Inheritance in TypeScript
+## Herencia de Clases en TypeScript
 
+TypeScript ofrece la capacidad completa de la herencia de clases de JavaScript, con dos adiciones principales: _interfaces_ y _clases abstractas_. Una interfaz es una estructura que describe y aplica la forma de una clase o un objeto, como proporcionar verificación de tipos para piezas de datos más complejas. Puede implementar una interfaz en una clase para asegurarse de que tenga una forma pública específica. Las clases abstractas son clases que sirven como base para otras clases, pero no se pueden instanciar ellas mismas. Ambos se implementan a través de la herencia de clases.
+
+En esta sección, verá algunos ejemplos de cómo se pueden usar las interfaces y las clases abstractas para construir y crear verificaciones de tipos para las clases.
+
+## Implementando Interfaces
+
+Las interfaces son útiles para especificar un conjunto de comportamientos que deben poseer todas las implementaciones de esa interfaz. Las interfaces se crean utilizando la palabra clave `interface` seguida del nombre de la interfaz y, a continuación, el cuerpo de la interfaz. Como ejemplo, cree una interfaz `Logger` que podría usarse para registrar datos importantes sobre cómo se ejecuta su programa:
+
+
+```ts
+interface Logger {}
+```
+
+A continuación, agregue cuatro métodos a su interfaz:
+
+
+```ts
+interface Logger {
+  debug(message: string, metadata?: Record<string, unknown>): void;
+  info(message: string, metadata?: Record<string, unknown>): void;
+  warning(message: string, metadata?: Record<string, unknown>): void;
+  error(message: string, metadata?: Record<string, unknown>): void;
+}
+```
+
+Como se muestra en este bloque de código, al crear los métodos en su interfaz, no les agrega ninguna implementación, solo su información de tipo. En este caso, tiene cuatro métodos: `debug`, `info`, `warning` y `error`. Todos ellos comparten la misma firma de tipo: Reciben dos parámetros, un `message` de tipo `string` y un parámetro `metadata` opcional de tipo `Record<string, unknown>`. Todos devuelven el tipo `void`.
+
+Todas las clases que implementen esta interfaz deben tener los parámetros correspondientes y los tipos de retorno para cada uno de estos métodos. Implemente la interfaz en una clase llamada `ConsoleLogger`, que registra todos los mensajes usando métodos de `console`:
+
+
+```ts{1}
+class ConsoleLogger implements Logger {
+  debug(message: string, metadata?: Record<string, unknown>) {
+    console.info(`[DEBUG] ${message}`, metadata);
+  }
+  info(message: string, metadata?: Record<string, unknown>) {
+    console.info(message, metadata);
+  }
+  warning(message: string, metadata?: Record<string, unknown>) {
+    console.warn(message, metadata);
+  }
+  error(message: string, metadata?: Record<string, unknown>) {
+    console.error(message, metadata);
+  }
+}
+```
+
+
+Tenga en cuenta que al crear su interfaz, está utilizando una nueva palabra clave llamada `implements` para especificar la lista de interfaces que implementa su clase. Puede implementar varias interfaces agregándolas como una lista separada por comas de identificadores de interfaz después de la palabra clave `implements`. Por ejemplo, si tuviera otra interfaz llamada `Clearable`:
+
+
+```ts
+interface Clearable {
+  clear(): void;
+}
+```
+
+Podría implementarlo en la clase `ConsoleLogger` agregando el siguiente código resaltado:
+
+
+```ts{1,2,3,4}
+class ConsoleLogger implements Logger, Clearable {
+  clear() {
+    console.clear();
+  }
+  debug(message: string, metadata?: Record<string, unknown>) {
+    console.info(`[DEBUG] ${message}`, metadata);
+  }
+  info(message: string, metadata?: Record<string, unknown>) {
+    console.info(message, metadata);
+  }
+  warning(message: string, metadata?: Record<string, unknown>) {
+    console.warn(message, metadata);
+  }
+  error(message: string, metadata?: Record<string, unknown>) {
+    console.error(message, metadata);
+  }
+}
+```
+
+
+Tenga en cuenta que también debe agregar el método `clear` para asegurarse de que la clase se adhiera a la nueva interfaz.
+
+
+Si no proporcionó la implementación para uno de los miembros requeridos por cualquiera de las interfaces, como el método `debug` de la interfaz `Logger`, el compilador de TypeScript le daría el error `2420`:
+
+
+```sh
+Output
+Class 'ConsoleLogger' incorrectly implements interface 'Logger'.
+  Property 'debug' is missing in type 'ConsoleLogger' but required in type 'Logger'. (2420)
+```
+
+
+El compilador de TypeScript también mostraría un error si su implementación no coincidiera con la esperada por la interfaz que está implementando. Por ejemplo, si cambió el tipo del parámetro `message` en el método `debug` de `string` a `number`, recibiría el error `2416`:
+
+
+```sh
+Output
+Property 'debug' in type 'ConsoleLogger' is not assignable to the same property in base type 'Logger'.
+  Type '(message: number, metadata?: Record<string, unknown> | undefined) => void' is not assignable to type '(message: string, metadata: Record<string, unknown>) => void'.
+    Types of parameters 'message' and 'message' are incompatible.
+      Type 'string' is not assignable to type 'number'. (2416)
+```
+
+## Building on Abstract Classes
