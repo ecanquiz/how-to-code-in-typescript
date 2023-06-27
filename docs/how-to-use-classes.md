@@ -858,12 +858,101 @@ El compilador de TypeScript no se quejaría. Incluso podría usar solo un objeto
 Con los conceptos básicos de usar una clase como un tipo fuera de la forma, ahora puede aprender a buscar clases específicas, en lugar de solo la forma.
 
 
-## The Type of `this`
+## El Tipo de `this`
 
 
+A veces necesitará hacer referencia al tipo de la clase actual dentro de algunos métodos en la clase misma. En esta sección, descubrirá cómo usar `this` para lograrlo.
+
+Imagina que tuvieras que agregar un nuevo método a tu clase `Employee` llamado `isSameEmployeeAs`, que sería responsable de verificar si otra instancia de empleado hace referencia al mismo empleado que el actual. Una forma de hacerlo sería como la siguiente:
 
 
+```ts
+class Employee {
+  constructor(
+    protected identifier: string
+  ) {}
 
+  getIdentifier() {
+    return this.identifier;
+  }
+
+  isSameEmployeeAs(employee: Employee) {
+    return this.identifier === employee.identifier;
+  }
+}
+```
+
+Esta prueba funcionará para comparar la propiedad `identifier` de todas las clases derivadas de `Employee`. Pero imagine un escenario en el que no desea que se comparen subclases específicas de `Employee` en absoluto. En este caso, en lugar de recibir el valor booleano de la comparación, querrá que TypeScript informe un error cuando se comparen dos subclases diferentes.
+
+Por ejemplo, cree dos nuevas subclases para los empleados de los departamentos de finanzas y marketing:
+
+
+```ts
+...
+class FinanceEmployee extends Employee {
+  specialFieldToFinanceEmployee = '';
+}
+
+class MarketingEmployee extends Employee {
+  specialFieldToMarketingEmployee = '';
+}
+
+const finance = new FinanceEmployee("fin-123");
+const marketing = new MarketingEmployee("mkt-123");
+
+marketing.isSameEmployeeAs(finance);
+```
+
+Aquí se derivan dos clases de la clase base `Employee`: `FinanceEmployee` y `MarketingEmployee`. Cada uno tiene diferentes campos nuevos. A continuación, está creando una instancia de cada uno y comprobando si el empleado `marketing` es el mismo que el empleado `finance`. Dado este escenario, TypeScript debería informar un error, ya que las subclases no deberían compararse en absoluto. Esto no sucede porque usó `Employee` como el tipo del parámetro `employee` en su método `isSameEmployeeAs`, y todas las clases derivadas de `Employee` pasarán la verificación de tipo.
+
+Para mejorar este código, podría usar un tipo especial disponible dentro de las clases, que es el tipo `this`. Este tipo se establece dinámicamente en el tipo de la clase actual. De esta forma, cuando se llama a este método en una clase derivada, `this` se establece en el tipo de la clase derivada.
+
+Cambia tu código para usar `this` en su lugar:
+
+
+```ts{10}
+class Employee {
+  constructor(
+    protected identifier: string
+  ) {}
+
+  getIdentifier() {
+    return this.identifier;
+  }
+
+  isSameEmployeeAs(employee: this) {
+    return this.identifier === employee.identifier;
+  }
+}
+
+class FinanceEmployee extends Employee {
+  specialFieldToFinanceEmployee = '';
+}
+
+class MarketingEmployee extends Employee {
+  specialFieldToMarketingEmployee = '';
+}
+
+const finance = new FinanceEmployee("fin-123");
+const marketing = new MarketingEmployee("mkt-123");
+
+marketing.isSameEmployeeAs(finance);
+```
+
+Al compilar este código, el compilador de TypeScript ahora mostrará el error `2345`:
+
+
+```sh
+Output
+Argument of type 'FinanceEmployee' is not assignable to parameter of type 'MarketingEmployee'.
+  Property 'specialFieldToMarketingEmployee' is missing in type 'FinanceEmployee' but required in type 'MarketingEmployee'. (2345)
+```
+
+
+Con la palabra clave `this`, puede cambiar el tipado dinámicamente en diferentes contextos de clase. A continuación, utilizará el tipado para pasar una clase en sí, en lugar de una instancia de una clase.
+
+
+## Using Construct Signatures
 
 
 
