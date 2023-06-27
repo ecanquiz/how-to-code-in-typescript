@@ -952,7 +952,136 @@ Argument of type 'FinanceEmployee' is not assignable to parameter of type 'Marke
 Con la palabra clave `this`, puede cambiar el tipado dinámicamente en diferentes contextos de clase. A continuación, utilizará el tipado para pasar una clase en sí, en lugar de una instancia de una clase.
 
 
-## Using Construct Signatures
+## Usar Firmas de Construcción
+
+Hay momentos en que un programador necesita crear una función que tome una clase directamente, en lugar de una instancia. Para eso, necesita usar un tipo especial con una firma de construcción. En esta sección, verá cómo crear dichos tipos.
+
+Un escenario particular en el que puede necesitar pasar una clase en sí misma es una fábrica de clases, o una función que genera nuevas instancias de clases que se pasan como argumentos. Imagine que desea crear una función que tome una clase basada en `Employee`, cree una nueva instancia con un identificador incrementado e imprima el identificador en la consola. Uno puede intentar crear esto de la siguiente manera:
+
+
+```ts
+class Employee {
+  constructor(
+    public identifier: string
+  ) {}
+}
+
+let identifier = 0;
+function createEmployee(ctor: Employee) {
+  const employee = new ctor(`test-${identifier++}`);
+  console.log(employee.identifier);
+}
+```
+
+En este fragmento, crea la clase `Employee`, inicializa el `identifier` y crea una función que instancia una clase basada en un parámetro de constructor `ctor` que tiene la forma de `Employee`. Pero si intentara compilar este código, el compilador de TypeScript daría el error `2351`:
+
+
+```sh
+Output
+This expression is not constructable.
+  Type 'Employee' has no construct signatures. (2351)
+```
+
+Esto sucede porque cuando usa el nombre de su clase como tipo para `ctor`, el tipo solo es válido para instancias de la clase. Para obtener el tipo del constructor de clase en sí, debe usar `typeof ClassName`. Compruebe el siguiente código resaltado con el cambio:
+
+
+```ts{8}
+class Employee {
+  constructor(
+    public identifier: string
+  ) {}
+}
+
+let identifier = 0;
+function createEmployee(ctor: typeof Employee) {
+  const employee = new ctor(`test-${identifier++}`);
+  console.log(employee.identifier);
+}
+```
+
+Ahora su código se compilará con éxito. Pero todavía hay un problema pendiente: dado que las fábricas de clases crean instancias de nuevas clases creadas a partir de una clase base, el uso de clases `abstract` podría mejorar el flujo de trabajo. Sin embargo, esto no funcionará inicialmente.
+
+Para probar esto, convierta la clase `Employee` en una clase `abstract`:
+
+
+```ts{1}
+abstract class Employee {
+  constructor(
+    public identifier: string
+  ) {}
+}
+
+let identifier = 0;
+function createEmployee(ctor: typeof Employee) {
+  const employee = new ctor(`test-${identifier++}`);
+  console.log(employee.identifier);
+}
+```
+
+El compilador de TypeScript ahora dará el error `2511`:
+
+
+```sh
+Output
+Cannot create an instance of an abstract class. (2511)
+```
+
+Este error muestra que no puede crear una instancia de la clase `Employee`, ya que es `abstract`. Pero es posible que desee utilizar una función de este tipo para crear diferentes tipos de empleados que se extiendan desde su clase abstracta `Employee`, como por ejemplo:
+
+
+```ts{7,9,17,18}
+abstract class Employee {
+  constructor(
+    public identifier: string
+  ) {}
+}
+
+class FinanceEmployee extends Employee {}
+
+class MarketingEmployee extends Employee {}
+
+let identifier = 0;
+function createEmployee(ctor: typeof Employee) {
+  const employee = new ctor(`test-${identifier++}`);
+  console.log(employee.identifier);
+}
+
+createEmployee(FinanceEmployee);
+createEmployee(MarketingEmployee);
+```
+
+Para que su código funcione para este escenario, debe usar un tipo con una firma de constructor. Puede hacer esto usando la palabra clave `new`, seguida de una sintaxis similar a la de una función de flecha, donde la lista de parámetros contiene los parámetros esperados por el constructor y el tipo de retorno es la instancia de clase que devuelve este constructor.
+
+En el siguiente código se destaca el cambio que introduce el tipo con una firma de constructor en su función `createEmployee`:
+
+
+```ts{12}
+abstract class Employee {
+  constructor(
+    public identifier: string
+  ) {}
+}
+
+class FinanceEmployee extends Employee {}
+
+class MarketingEmployee extends Employee {}
+
+let identifier = 0;
+function createEmployee(ctor: new (identifier: string) => Employee) {
+  const employee = new ctor(`test-${identifier++}`);
+  console.log(employee.identifier);
+}
+
+createEmployee(FinanceEmployee);
+createEmployee(MarketingEmployee);
+```
+
+El compilador de TypeScript ahora compilará correctamente su código.
+
+
+## Conclusión
+
+Las clases en TypeScript son aún más poderosas que en JavaScript porque tiene acceso al sistema de tipos, sintaxis adicional como métodos de función de flecha y características completamente nuevas como visibilidad de miembros y clases abstractas. Esto le ofrece una manera de entregar código que sea seguro para los tipos, más confiable y que represente mejor el modelo de negocio de su aplicación.
 
 
 
