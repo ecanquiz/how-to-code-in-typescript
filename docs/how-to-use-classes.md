@@ -470,4 +470,17 @@ Property 'write' in type 'FileStream' is not assignable to the same property in 
 Con las clases e interfaces abstractas, puede realizar comprobaciones de tipos más complejas para sus clases a fin de asegurarse de que las clases extendidas a partir de las clases base hereden la funcionalidad correcta. A continuación, verá ejemplos de cómo funciona la visibilidad de métodos y propiedades en TypeScript.
 
 
-## Class Members Visibility
+## Visibilidad de Miembros de Clase
+
+
+TypeScript aumenta la sintaxis de clases de JavaScript disponible al permitirle especificar la visibilidad de los miembros de una clase. En este caso, la _visibilidad_ se refiere a cómo el código fuera de una clase instanciada puede interactuar con un miembro dentro de la clase.
+
+
+Los miembros de la clase en TypeScript pueden tener tres posibles modificadores de visibilidad: `public`, `protected` y `private`. Se puede acceder a los miembros `public` fuera de la instancia de la clase, mientras que a los `private` no se puede. `protected` ocupa un término medio entre los dos, donde las instancias de la clase o subclases basadas en esa clase pueden acceder a los miembros.
+
+En esta sección, examinará los modificadores de visibilidad disponibles y aprenderá lo que significan.
+
+
+## `public`
+
+
