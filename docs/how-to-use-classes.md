@@ -783,4 +783,87 @@ abc-123
 Esto demuestra cómo TypeScript le permite usar funciones de flecha como valores directos de métodos de clase. En la siguiente sección, aprenderá cómo hacer cumplir las clases con la verificación de tipos de TypeScript.
 
 
-## Using Classes as Types
+## Usando Clases como Tipos
+
+Hasta ahora, este tutorial ha cubierto cómo crear clases y usarlas directamente. En esta sección, utilizará clases como tipos cuando trabaje con TypeScript.
+
+Las clases son tanto un tipo como un valor en TypeScript y, como tales, se pueden usar de ambas formas. Para usar una clase como tipo, use el nombre de la clase en cualquier lugar donde TypeScript espere un tipo. Por ejemplo, dada la clase `Employee` que creó anteriormente:
+
+
+```ts
+class Employee {
+  constructor(
+    public identifier: string
+  ) {}
+}
+```
+
+Imagina que quisieras crear una función que imprima el identificador de cualquier empleado. Podrías crear una función como esta:
+
+
+```ts{7,8,9}
+class Employee {
+  constructor(
+    public identifier: string
+  ) {}
+}
+
+function printEmployeeIdentifier(employee: Employee) {
+  console.log(employee.identifier);
+}
+```
+
+Observe que está configurando el parámetro `employee` para que sea del tipo `Employee`, que es el nombre exacto de su clase.
+
+Las clases en TypeScript se comparan con otros tipos, incluidas otras clases, al igual que otros tipos se comparan en TypeScript: estructuralmente. Esto significa que si tuviera dos clases diferentes que tuvieran la misma forma (es decir, el mismo conjunto de miembros con la misma visibilidad), ambas se pueden usar indistintamente en lugares en los que esperaría solo uno de ellos.
+
+Para ilustrar esto, imagine que tiene otra clase en su aplicación llamada `Warehouse`:
+
+
+```ts
+class Warehouse {
+  constructor(
+    public identifier: string
+  ) {}
+}
+```
+
+Tiene la misma forma que `Employee`. Si intentó pasar una instancia de él a `printEmployeeIdentifier`:
+
+
+```ts
+class Employee {
+  constructor(
+    public identifier: string
+  ) {}
+}
+
+class Warehouse {
+  constructor(
+    public identifier: string
+  ) {}
+}
+
+function printEmployeeIdentifier(employee: Employee) {
+  console.log(employee.identifier);
+}
+
+const warehouse = new Warehouse("abc");
+
+printEmployeeIdentifier(warehouse);
+```
+
+El compilador de TypeScript no se quejaría. Incluso podría usar solo un objeto normal en lugar de la instancia de una clase. Como esto puede dar lugar a un comportamiento que no espera un programador que acaba de empezar con TypeScript, es importante estar atento a estos escenarios.
+
+Con los conceptos básicos de usar una clase como un tipo fuera de la forma, ahora puede aprender a buscar clases específicas, en lugar de solo la forma.
+
+
+## The Type of `this`
+
+
+
+
+
+
+
+
