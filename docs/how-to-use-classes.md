@@ -557,3 +557,86 @@ Tenga en cuenta que puede acceder a todos los miembros de su clase.
 
 
 ## `protected`
+
+
+Los miembros de clase con la visibilidad `protected` solo pueden usarse dentro de la clase en la que están declarados o en las subclases de esa clase.
+
+
+Eche un vistazo a la siguiente clase `Employee` y la clase `FinanceEmployee` que se basa en ella:
+
+
+```ts{3,9}
+class Employee {
+  constructor(
+    protected identifier: string
+  ) {}
+}
+
+class FinanceEmployee extends Employee {
+  getFinanceIdentifier() {
+    return `fin-${this.identifier}`;
+  }
+}
+```
+
+
+El código resaltado muestra la propiedad `identifier` declarada con visibilidad `protected`. El código `this.identifier` intenta acceder a esta propiedad desde la subclase `FinanceEmployee`. Este código se ejecutaría sin error en TypeScript.
+
+Si intentó usar ese método desde un lugar que no está dentro de la clase en sí, o dentro de una subclase, como en el siguiente ejemplo:
+
+
+```ts{14}
+class Employee {
+  constructor(
+    protected identifier: string
+  ) {}
+}
+
+class FinanceEmployee extends Employee {
+  getFinanceIdentifier() {
+    return `fin-${this.identifier}`;
+  }
+}
+
+const financeEmployee = new FinanceEmployee('abc-12345');
+financeEmployee.identifier;
+```
+
+
+El compilador de TypeScript nos daría el error `2445`:
+
+
+```sh
+Output
+Property 'identifier' is protected and only accessible within class 'Employee' and its subclasses. (2445)
+```
+
+Esto se debe a que la propiedad `identifier` de la nueva instancia `financeEmployee` no se puede recuperar del espacio global. En su lugar, tendría que usar el método interno `getFinanceIdentifier` para devolver una cadena que incluyera la propiedad `identifier`:
+
+
+```ts
+class Employee {
+  constructor(
+    protected identifier: string
+  ) {}
+}
+
+class FinanceEmployee extends Employee {
+  getFinanceIdentifier() {
+    return `fin-${this.identifier}`;
+  }
+}
+
+const financeEmployee = new FinanceEmployee('abc-12345');
+console.log(financeEmployee.getFinanceIdentifier())
+```
+
+Esto registraría lo siguiente en la consola:
+
+
+```sh
+Output
+fin-abc-12345
+```
+
+## `private`
