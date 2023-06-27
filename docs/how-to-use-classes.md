@@ -640,3 +640,39 @@ fin-abc-12345
 ```
 
 ## `private`
+
+Solo se puede acceder a los miembros privados dentro de la clase que los declara. Esto significa que ni siquiera las subclases tienen acceso a él.
+
+Usando el ejemplo anterior, convierta la propiedad `identifier` en la clase `Employee` en una propiedad `private`:
+
+
+```ts{3}
+class Employee {
+  constructor(
+    private identifier: string
+  ) {}
+}
+
+class FinanceEmployee extends Employee {
+  getFinanceIdentifier() {
+    return `fin-${this.identifier}`;
+  }
+}
+```
+
+
+Este código ahora hará que el compilador de TypeScript muestre el error `2341`:
+
+
+```sh
+Output
+Property 'identifier' is private and only accessible within class 'Employee'. (2341)
+```
+
+Esto sucede porque está accediendo a la propiedad `identifier` en la subclase `FinanceEmployee`, y esto no está permitido, ya que la propiedad `identifier` se declaró en la clase `Employee` y tiene su visibilidad configurada como `private`.
+
+Recuerde que TypeScript se compila en JavaScript sin procesar que, por sí mismo, no tiene forma de especificar la visibilidad de los miembros de una clase. Como tal, TypeScript no tiene protección contra dicho uso durante el tiempo de ejecución. Esta es una verificación de seguridad realizada por el compilador de TypeScript solo durante la compilación.
+
+Ahora que ha probado los modificadores de visibilidad, puede pasar a las funciones de flecha como métodos en las clases de TypeScript.
+
+## Class Methods as Arrow Functions
