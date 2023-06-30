@@ -43,7 +43,57 @@ Al trabajar en un proyecto que tiene un archivo `tsconfig.json`, para habilitar 
 
 En TypeScript Playground, los decoradores están habilitados de forma predeterminada.
 
+## Usando la Sintaxis del Decorador
+
+En esta sección, aplicará decoradores en clases de TypeScript.
+
+En TypeScript, puede crear decoradores utilizando la sintaxis especial `@expression`, donde `expression` es una función que se llamará automáticamente durante el tiempo de ejecución con detalles sobre el objetivo del decorador.
+
+El objetivo de un decorador depende de dónde lo agregue. Actualmente, los decoradores se pueden agregar a los siguientes componentes de una clase:
+
+- Declaración de clase en sí
+- Propiedades
+- Accesorios
+- Métodos
+- Parámetros
+
+Por ejemplo, supongamos que tiene un decorador llamado `sealed` que llama a [`Object.seal`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/seal) en una clase. Para usar tu decorador podrías escribir lo siguiente:
+
+```ts{1}
+@sealed
+class Person {}
+```
+
+Observe en el código resaltado que agregó el decorador justo antes del objetivo de su decorador `sealed`, en este caso, la declaración de la clase `Person`.
+
+Lo mismo es válido para todos los demás tipos de decoradores:
 
 
+```ts
+@classDecorator
+class Person {
+  @propertyDecorator
+  public name: string;
+
+  @accessorDecorator
+  get fullName() {
+    // ...
+  }
+
+  @methodDecorator
+  printName(@parameterDecorator prefix: string) {
+    // ...
+  }
+}
+```
+
+Para agregar varios decoradores, agréguelos juntos, uno tras otro:
 
 
+```ts
+@decoratorA
+@decoratorB
+class Person {}
+```
+
+## Creating Class Decorators in TypeScript
