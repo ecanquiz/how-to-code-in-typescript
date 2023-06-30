@@ -96,4 +96,36 @@ Para agregar varios decoradores, agréguelos juntos, uno tras otro:
 class Person {}
 ```
 
-## Creating Class Decorators in TypeScript
+## Creación de Decoradores de Clase en TypeScript
+
+En esta sección, seguirá los pasos para crear decoradores de clase en TypeScript.
+
+Para un decorador llamado `@decoratorA`, le dice a TypeScript que debe llamar a la función `decoratorA`. Se llamará a la función `decoratorA` con detalles sobre cómo usó el decorador en su código. Por ejemplo, si aplicó el decorador a una declaración de clase, la función recibirá detalles sobre la clase. Esta función debe estar disponible para que su decorador funcione.
+
+Para crear su propio decorador, debe crear una función con el mismo nombre que su decorador. Es decir, para crear el decorador de clase `sealed` que viste en la sección anterior, debes crear una función `sealed` que reciba un conjunto específico de parámetros. Hagamos exactamente eso:
+
+
+```ts
+@sealed
+class Person {}
+
+function sealed(target: Function) {
+  Object.seal(target);
+  Object.seal(target.prototype);
+}
+```
+
+Los parámetros pasados al decorador dependerán de dónde se utilizará el decorador. El primer parámetro se denomina comúnmente `target`.
+
+El decorador `sealed` se usará solo en declaraciones de clase, por lo que su función recibirá un solo parámetro, el `target`, que será de tipo `Function`. Este será el constructor de la clase a la que se aplicó el decorador.
+
+En la función `sealed`, llama a `Object.seal` sobre el `target`, que es el constructor de la clase, y también sobre su prototipo. Cuando lo haga, no se pueden agregar nuevas propiedades al constructor de clase o su propiedad, y las existentes se marcarán como no configurables.
+
+Es importante recordar que actualmente no es posible extender el tipo TypeScript del `target` cuando se usan decoradores. Esto significa, por ejemplo, que no puede agregar un nuevo campo a una clase usando un decorador y hacerlo con seguridad de tipos.
+
+Si devolvió un valor en el decorador de clase `sealed`, este valor se convertirá en la nueva función constructora de la clase. Esto es útil si desea sobrescribir completamente el constructor de clases.
+
+Ha creado su primer decorador y lo ha utilizado con una clase. En la siguiente sección aprenderá a crear fábricas de decoradores.
+
+## Creating Decorator Factories
+
