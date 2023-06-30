@@ -17,7 +17,7 @@ Actualmente, hay una [propuesta de etapa 2 que agrega decoradores](https://tc39.
 
 Este tutorial le mostrará cómo crear sus propios decoradores en TypeScript para clases y miembros de clases, y también cómo usarlos. Lo guiará a través de diferentes ejemplos de código, que puede seguir en su propio entorno de TypeScript o en [TypeScript Playground](https://www.typescriptlang.org/play?ts=4.2.2#), un entorno en línea que le permite escribir TypeScript directamente en el navegador.
 
-## Habilitación del Soporte de Decoradores en TypeScript
+## Habilitar Soporte de Decoradores en TypeScript
 
 Actualmente, los decoradores siguen siendo una función experimental en TypeScript y, como tal, primero se debe habilitar. En esta sección, verá cómo habilitar los decoradores en TypeScript, según la forma en que trabaje con TypeScript.
 
@@ -43,7 +43,150 @@ Al trabajar en un proyecto que tiene un archivo `tsconfig.json`, para habilitar 
 
 En TypeScript Playground, los decoradores están habilitados de forma predeterminada.
 
+## Usando Sintaxis del Decorador
+
+En esta sección, aplicará decoradores en clases de TypeScript.
+
+En TypeScript, puede crear decoradores utilizando la sintaxis especial `@expression`, donde `expression` es una función que se llamará automáticamente durante el tiempo de ejecución con detalles sobre el objetivo del decorador.
+
+El objetivo de un decorador depende de dónde lo agregue. Actualmente, los decoradores se pueden agregar a los siguientes componentes de una clase:
+
+- Declaración de clase en sí
+- Propiedades
+- Accesorios
+- Métodos
+- Parámetros
+
+Por ejemplo, supongamos que tiene un decorador llamado `sealed` que llama a [`Object.seal`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/seal) en una clase. Para usar tu decorador podrías escribir lo siguiente:
+
+```ts{1}
+@sealed
+class Person {}
+```
+
+Observe en el código resaltado que agregó el decorador justo antes del objetivo de su decorador `sealed`, en este caso, la declaración de la clase `Person`.
+
+Lo mismo es válido para todos los demás tipos de decoradores:
 
 
+```ts
+@classDecorator
+class Person {
+  @propertyDecorator
+  public name: string;
 
+  @accessorDecorator
+  get fullName() {
+    // ...
+  }
+
+  @methodDecorator
+  printName(@parameterDecorator prefix: string) {
+    // ...
+  }
+}
+```
+
+Para agregar varios decoradores, agréguelos juntos, uno tras otro:
+
+
+```ts
+@decoratorA
+@decoratorB
+class Person {}
+```
+
+## Creando Decoradores de Clase en TypeScript
+
+En esta sección, seguirá los pasos para crear decoradores de clase en TypeScript.
+
+Para un decorador llamado `@decoratorA`, le dice a TypeScript que debe llamar a la función `decoratorA`. Se llamará a la función `decoratorA` con detalles sobre cómo usó el decorador en su código. Por ejemplo, si aplicó el decorador a una declaración de clase, la función recibirá detalles sobre la clase. Esta función debe estar disponible para que su decorador funcione.
+
+Para crear su propio decorador, debe crear una función con el mismo nombre que su decorador. Es decir, para crear el decorador de clase `sealed` que viste en la sección anterior, debes crear una función `sealed` que reciba un conjunto específico de parámetros. Hagamos exactamente eso:
+
+
+```ts
+@sealed
+class Person {}
+
+function sealed(target: Function) {
+  Object.seal(target);
+  Object.seal(target.prototype);
+}
+```
+
+Los parámetros pasados al decorador dependerán de dónde se utilizará el decorador. El primer parámetro se denomina comúnmente `target`.
+
+El decorador `sealed` se usará solo en declaraciones de clase, por lo que su función recibirá un solo parámetro, el `target`, que será de tipo `Function`. Este será el constructor de la clase a la que se aplicó el decorador.
+
+En la función `sealed`, llama a `Object.seal` sobre el `target`, que es el constructor de la clase, y también sobre su prototipo. Cuando lo haga, no se pueden agregar nuevas propiedades al constructor de clase o su propiedad, y las existentes se marcarán como no configurables.
+
+Es importante recordar que actualmente no es posible extender el tipo TypeScript del `target` cuando se usan decoradores. Esto significa, por ejemplo, que no puede agregar un nuevo campo a una clase usando un decorador y hacerlo con seguridad de tipos.
+
+Si devolvió un valor en el decorador de clase `sealed`, este valor se convertirá en la nueva función constructora de la clase. Esto es útil si desea sobrescribir completamente el constructor de clases.
+
+Ha creado su primer decorador y lo ha utilizado con una clase. En la siguiente sección aprenderá a crear fábricas de decoradores.
+
+## Creando Fábricas de Decoradores
+
+A veces necesitarás pasar opciones adicionales al decorador al aplicarlo, y para eso, tienes que usar fábricas de decoradores. En esta sección, aprenderá cómo crear esas fábricas y usarlas.
+
+Las fábricas de decoradores son funciones que devuelven otra función. Reciben este nombre porque no son la implementación del decorador en sí. En su lugar, devuelven otra función responsable de la implementación del decorador y actúan como una función contenedora. Son útiles para hacer que los decoradores sean personalizables, al permitir que el código del cliente pase opciones a los decoradores cuando los usan.
+
+Imaginemos que tiene un decorador de clase llamado `decoratorA` y desea agregar una opción que se puede configurar al llamar al decorador, como una bandera booleana. Puede lograr esto escribiendo una fábrica de decoradores similar a la siguiente:
+
+
+```ts{1}
+const decoratorA = (someBooleanFlag: boolean) => {
+  return (target: Function) => {
+  }
+}
+```
+
+Aquí, su función `decoradorA` devuelve otra función con la implementación del decorador. Observe cómo la fábrica de decoradores recibe una bandera booleana como su único parámetro. 
+
+
+Puede pasar el valor de este parámetro cuando usa el decorador. Vea el código resaltado en el siguiente ejemplo:
+
+
+```ts{6}
+const decoratorA = (someBooleanFlag: boolean) => {
+  return (target: Function) => {
+  }
+}
+
+@decoratorA(true)
+class Person {}
+```
+
+Aquí, cuando usa el decorador `decoratorA`, la fábrica de decoradores se llamará con el parámetro `someBooleanFlag` establecido en `true`. Luego se ejecutará la implementación del decorador. Esto le permite cambiar el comportamiento de su decorador en función de cómo se usó, lo que hace que sus decoradores sean fáciles de personalizar y reutilizar a través de su aplicación.
+
+Tenga en cuenta que debe pasar todos los parámetros esperados por la fábrica decoradora. Si simplemente aplicó el decorador sin pasar ningún parámetro, como en el siguiente ejemplo:
+
+
+```ts
+const decoratorA = (someBooleanFlag: boolean) => {
+  return (target: Function) => {
+  }
+}
+
+@decoratorA
+class Person {}
+```
+
+El Compilador de TypeScript le dará dos errores, que pueden variar según el tipo de decorador. Para los decoradores de clase, los errores son `1238` y `1240`:
+
+
+```sh
+Output
+Unable to resolve signature of class decorator when called as an expression.
+  Type '(target: Function) => void' is not assignable to type 'typeof Person'.
+    Type '(target: Function) => void' provides no match for the signature 'new (): Person'. (1238)
+Argument of type 'typeof Person' is not assignable to parameter of type 'boolean'. (2345)
+```
+
+Acaba de crear una fábrica de decoradores que puede recibir parámetros y cambiar su comportamiento en función de estos parámetros. En el siguiente paso, aprenderá a crear decoradores de propiedades.
+
+
+## Creating Property Decorators
 
