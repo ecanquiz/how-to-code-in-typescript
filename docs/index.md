@@ -30,6 +30,8 @@ features:
     details: Las clases son una abstracción común utilizada en los lenguajes de programación orientada a objetos (POO) para describir estructuras de datos conocidas como objetos. TypeScript tiene soporte completo para la sintaxis de clase y también agrega características, como visibilidad de miembros, clases abstractas, clases genéricas, métodos de función de flecha y algunos otros. Este tutorial repasará la sintaxis utilizada para crear clases, las diferentes funciones disponibles y cómo se tratan las clases en TypeScript durante la verificación de tipos en tiempo de compilación.
   - title: Cómo Usar Decoradores en TypeScript
     details: Los decoradores son una forma de decorar miembros de una clase, o una clase en sí misma, con funcionalidad adicional. Este tutorial cubre la creación de decoradores en TypeScript para clases y miembros de clase, y también cómo usarlos.
+  - title: Cómo Usar Interfaces en TypeScript
+    details: TypeScript ofrece múltiples formas de representar objetos en su código, una de las cuales es usar interfaces. Las interfaces en TypeScript tienen dos escenarios de uso, puede crear un contrato que deben seguir las clases, como los miembros que esas clases deben implementar, y también puede representar tipos en su aplicación, al igual que la declaración de tipo normal. Puede notar que las interfaces y los tipos comparten un conjunto similar de características. En este tutorial, creará interfaces en TypeScript, aprenderá a usarlas y comprenderá las diferencias entre los tipos normales y las interfaces.
     
 footer: MIT Licensed | Copyleft © 2023-present Ernesto Canquiz
 ---
