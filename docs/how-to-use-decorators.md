@@ -460,9 +460,7 @@ Aquí hay un ejemplo de un decorador que se puede usar para cambiar la bandera `
 
 ```ts
 const enumerable = (value: boolean) => {
-  return ( 
-    target: any, memberName: string, propertyDescriptor: PropertyDescriptor
-  ) => {
+  return (target: any, memberName: string, propertyDescriptor: PropertyDescriptor) => {
     propertyDescriptor.enumerable = value;
   }
 }
@@ -486,10 +484,149 @@ class Person {
 
 Los decoradores de acceso son similares a los decoradores de propiedades. La única diferencia es que reciben un tercer parámetro con el descriptor de propiedad. Ahora que creó su primer decorador de acceso, la siguiente sección le mostrará cómo crear decoradores de método.
 
-## Creating Method Decorators
+## Creando de Decoradores de Métodos
+
+En esta sección, verá cómo usar los decoradores de métodos.
+
+La implementación de los decoradores de métodos es muy similar a la forma en que crea decoradores de acceso. Los parámetros que se pasan a la implementación del decorador son idénticos a los que se pasan a los decoradores de acceso.
+
+Reutilicemos el mismo decorador `enumerable` que creó antes, pero esta vez en el método `getFullName` de la siguiente clase `Person`:
+
+
+```ts
+const enumerable = (value: boolean) => {
+  return (target: any, memberName: string, propertyDescriptor: PropertyDescriptor) => {
+    propertyDescriptor.enumerable = value;
+  }
+}
+
+class Person {
+  firstName: string = "Jon"
+  lastName: string = "Doe"
+
+  @enumerable(true)
+  getFullName () {
+    return `${this.firstName} ${this.lastName}`;
+  }
+}
+```
+
+
+Si devolvió un valor del decorador de su método, este valor se convertirá en el nuevo Descriptor de Propiedad del método.
+
+Vamos a crear un decorador `deprecated` que imprima el mensaje pasado a la consola cuando se use el método, registrando un mensaje que diga que el método está obsoleto:
+
+
+```ts
+const deprecated = (deprecationReason: string) => {
+  return (target: any, memberName: string, propertyDescriptor: PropertyDescriptor) => {
+    return {
+      get() {
+        const wrapperFn = (...args: any[]) => {
+          console.warn(`Method ${memberName} is deprecated with reason: ${deprecationReason}`);
+          propertyDescriptor.value.apply(this, args)
+        }
+
+        Object.defineProperty(this, memberName, {
+            value: wrapperFn,
+            configurable: true,
+            writable: true
+        });
+        return wrapperFn;
+      }
+    }
+  }
+}
+```
+
+Aquí, está creando un decorador utilizando una fábrica de decoradores. Esta fábrica de decoradores recibe un solo argumento de tipo `string`, que es el motivo del desuso, como se muestra en la parte resaltada a continuación:
+
+
+```ts{1}
+const deprecated = (deprecationReason: string) => {
+  return (target: any, memberName: string, propertyDescriptor: PropertyDescriptor) => {
+    // ...
+  }
+}
+```
 
 
 
+El `deprecationReason` se usará más adelante cuando se registre el mensaje de obsoleto en la consola. En la implementación de su decorador `deprecated`, está devolviendo un valor. Cuando devuelve un valor de un decorador de método, este valor sobrescribirá el Descriptor de Propiedad de este miembro.
+
+Está aprovechando eso para agregar un `getter` a su método de clase decorado. De esta manera, puede cambiar la implementación del método en sí.
+
+Pero, ¿por qué no usar simplemente `Object.defineProperty` en lugar de devolver un nuevo decorador de propiedades para el método? Esto es necesario ya que necesita acceder al valor de `this`, que para los métodos de clase no estáticos, está vinculado a la instancia de clase. Si usó `Object.defineProperty` directamente, no habría forma de recuperar el valor de `this`, y si usó el método `this` de alguna manera, el decorador rompería su código cuando ejecuta el método envuelto desde su implementación de decorador.
+
+En su caso, el `getter` en sí mismo tiene valor `this` vinculado a la instancia de clase para métodos no estáticos y vinculado al constructor de clase para métodos estáticos.
+
+Dentro de su `getter`, luego está creando una función contenedora localmente, llamada `wrapperFn`, esta función registra un mensaje en la consola usando `console.warn`, pasando el `deprecationReason` recibido de la fábrica decoradora, luego está llamando al método original, usando `propertyDescriptor.value.apply(this, args)`, de esta manera se llama al método original con su valor `this` vinculado correctamente a la instancia de la clase en caso de que sea un método no estático.
 
 
+Luego está utilizando `defineProperty` para sobrescribir el valor de su método en la clase. Esto funciona como un mecanismo de [memorización](https://www.digitalocean.com/community/tutorials/js-understanding-recursion), ya que varias llamadas al mismo método ya no llamarán a su `getter`, sino directamente al `wrapperFn`. Ahora está configurando el miembro en la clase para que tenga su `wrapperFn` como su valor mediante `Object.defineProperty`.
 
+Usemos su decorador `deprecated`:
+
+
+```ts
+const deprecated = (deprecationReason: string) => {
+  return (target: any, memberName: string, propertyDescriptor: PropertyDescriptor) => {
+    return {
+      get() {
+        const wrapperFn = (...args: any[]) => {
+          console.warn(`Method ${memberName} is deprecated with reason: ${deprecationReason}`);
+          propertyDescriptor.value.apply(this, args)
+        }
+
+        Object.defineProperty(this, memberName, {
+            value: wrapperFn,
+            configurable: true,
+            writable: true
+        });
+        return wrapperFn;
+      }
+    }
+  }
+}
+
+class TestClass {
+  static staticMember = true;
+
+  instanceMember: string = "hello"
+
+  @deprecated("Use another static method")
+  static deprecatedMethodStatic() {
+    console.log('inside deprecated static method - staticMember =', this.staticMember);
+  }
+
+  @deprecated("Use another instance method")
+  deprecatedMethod () {
+    console.log('inside deprecated instance method - instanceMember =', this.instanceMember);
+  }
+}
+
+TestClass.deprecatedMethodStatic();
+
+const instance = new TestClass();
+instance.deprecatedMethod();
+```
+
+Aquí, creó un `TestClass` con dos propiedades: una estática y otra no estática. También creó dos métodos: uno estático y otro no estático.
+
+Luego está aplicando su decorador `deprecated` a ambos métodos. Cuando ejecute el código, aparecerá lo siguiente en la consola:
+
+
+```sh
+Output
+(warning) Method deprecatedMethodStatic is deprecated with reason: Use another static method
+inside deprecated static method - staticMember = true
+(warning)) Method deprecatedMethod is deprecated with reason: Use another instance method
+inside deprecated instance method - instanceMember = hello
+```
+
+Esto muestra que ambos métodos se empaquetaron correctamente con su función contenedora, que registra un mensaje en la consola con el motivo de desuso.
+
+Ahora ha creado su primer decorador de métodos usando TypeScript. La siguiente sección le mostrará cómo crear el último tipo de decorador compatible con TypeScript, un decorador de parámetros.
+
+
+## Creating Parameter Decorators
