@@ -53,7 +53,7 @@ El objetivo de un decorador depende de dónde lo agregue. Actualmente, los decor
 
 - Declaración de clase en sí
 - Propiedades
-- Accesorios
+- Accesores
 - Métodos
 - Parámetros
 
@@ -440,6 +440,56 @@ Demostrando que funciona como se esperaba, `person.name` nunca se establece a `P
 
 Ahora que creó su primer decorador de propiedades usando una función de decorador normal y una fábrica de decoradores, es hora de echar un vistazo a cómo crear decoradores para accesores de clase.
 
-## Creating Accessor Decorators
+## Creando Decoradores de Acceso
+
+En esta sección, verás cómo decorar accesos de clase.
+
+Al igual que los decoradores de propiedades, los decoradores utilizados en un descriptor de acceso reciben los siguientes parámetros:
+
+1. Para propiedades estáticas, la función constructora de la clase, para todas las demás propiedades, el prototipo de la clase.
+2. El nombre del miembro.
+
+Pero a diferencia del decorador de propiedades, también recibe un tercer parámetro, con el Descriptor de Propiedades del miembro accesor.
+
+Dado el hecho de que los descriptores de propiedad contienen tanto el _setter_ como el _getter_ para un miembro en particular, los decoradores de acceso solo se pueden aplicar al _setter_ o al _getter_ de un solo miembro, no a ambos.
+
+Si devuelve un valor de su decorador de acceso, este valor se convertirá en el nuevo Descriptor de Propiedad del acceso para los miembros _getter_ y _setter_.
+
+Aquí hay un ejemplo de un decorador que se puede usar para cambiar la bandera `enumerable` de un accesor _getter_/_setter_:
+
+
+```ts
+const enumerable = (value: boolean) => {
+  return ( 
+    target: any, memberName: string, propertyDescriptor: PropertyDescriptor
+  ) => {
+    propertyDescriptor.enumerable = value;
+  }
+}
+```
+
+
+Observe en el ejemplo cómo está utilizando una fábrica de decoradores. Esto le permite especificar la bandera enumerable al llamar a su decorador. Así es como podrías usar tu decorador:
+
+
+```ts
+class Person {
+  firstName: string = "Jon"
+  lastName: string = "Doe"
+
+  @enumerable(true)
+  get fullName () {
+    return `${this.firstName} ${this.lastName}`;
+  }
+}
+```
+
+Los decoradores de acceso son similares a los decoradores de propiedades. La única diferencia es que reciben un tercer parámetro con el descriptor de propiedad. Ahora que creó su primer decorador de acceso, la siguiente sección le mostrará cómo crear decoradores de método.
+
+## Creating Method Decorators
+
+
+
+
 
 
