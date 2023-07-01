@@ -188,5 +188,258 @@ Argument of type 'typeof Person' is not assignable to parameter of type 'boolean
 Acaba de crear una fábrica de decoradores que puede recibir parámetros y cambiar su comportamiento en función de estos parámetros. En el siguiente paso, aprenderá a crear decoradores de propiedades.
 
 
-## Creating Property Decorators
+## Creando Decoradores de Propiedades
+
+Las propiedades de clase son otro lugar donde puede usar decoradores. En esta sección, verás cómo crearlos.
+
+Cualquier decorador de propiedades recibe los siguientes parámetros:
+
+- Para propiedades estáticas, la función constructora de la clase. Para todas las demás propiedades, el prototipo de la clase.
+- El nombre del miembro.
+
+Actualmente, no hay forma de obtener el descriptor de propiedad como parámetro. Esto se debe a la forma en que se inicializan los decoradores de propiedades en TypeScript.
+
+Aquí hay una función de decorador que imprimirá el nombre del miembro en la consola:
+
+
+```ts
+const printMemberName = (target: any, memberName: string) => {
+  console.log(memberName);
+};
+
+class Person {
+  @printMemberName
+  name: string = "Jon";
+}
+```
+
+Cuando ejecute el código TypeScript anterior, verá lo siguiente impreso en la consola:
+
+
+```sh
+Output
+name
+```
+
+Puede utilizar decoradores de propiedades para anular la propiedad que se está decorando. Esto se puede hacer usando [`Object.defineProperty`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty) junto con un nuevo _setter_ y _getter_ para la propiedad. Veamos cómo puede crear un decorador llamado `allowlist`, que solo permite que una propiedad se establezca en valores presentes en una estática lista de permitidos:
+
+
+```ts
+const allowlist = ["Jon", "Jane"];
+
+const allowlistOnly = (target: any, memberName: string) => {
+  let currentValue: any = target[memberName];
+
+  Object.defineProperty(target, memberName, {
+    set: (newValue: any) => {
+      if (!allowlist.includes(newValue)) {
+        return;
+      }
+      currentValue = newValue;
+    },
+    get: () => currentValue
+  });
+};
+```
+
+Primero, está creando una estática lista de permitidos en la parte superior del código:
+
+
+```ts
+const allowlist = ["Jon", "Jane"];
+```
+
+A continuación, está creando la implementación del decorador de propiedades:
+
+
+```ts
+const allowlistOnly = (target: any, memberName: string) => {
+  let currentValue: any = target[memberName];
+
+  Object.defineProperty(target, memberName, {
+    set: (newValue: any) => {
+      if (!allowlist.includes(newValue)) {
+        return;
+      }
+      currentValue = newValue;
+    },
+    get: () => currentValue
+  });
+};
+```
+
+Observe cómo está utilizando `any` como el tipo del `target`:
+
+
+```ts{1}
+const allowlistOnly = (target: any, memberName: string) => {
+```
+
+
+Para los decoradores de propiedades, el tipo del parámetro de destino puede ser el constructor de la clase o el prototipo de la clase; es más fácil usar `any` en esta situación.
+
+En la primera línea de la implementación de su decorador, está almacenando el valor actual de la propiedad que se está decorando en la variable `currentValue`:
+
+
+```ts
+let currentValue: any = target[memberName];
+```
+
+Para las propiedades estáticas, esto se establecerá en su valor predeterminado, si corresponde. Para propiedades no estáticas, esto siempre será `undefined`. Esto se debe a que, en tiempo de ejecución, en el código JavaScript compilado, el decorador se ejecuta antes de que la propiedad de la instancia se establezca en su valor predeterminado.
+
+Luego está anulando la propiedad usando `Object.defineProperty`:
+
+
+```ts
+Object.defineProperty(target, memberName, {
+  set: (newValue: any) => {
+    if (!allowlist.includes(newValue)) {
+      return;
+    }
+    currentValue = newValue;
+  },
+  get: () => currentValue
+});
+```
+
+La llamada `Object.defineProperty` tiene un `getter` y un `setter`. El `getter` devuelve el valor almacenado en la variable `currentValue`. El `setter` establecerá el valor de `currentVariable` en `newValue` si está dentro de la lista de permitidos.
+
+Usemos el decorador que acabas de escribir. Cree la siguiente clase `Person`:
+
+```ts
+class Person {
+  @allowlistOnly
+  name: string = "Jon";
+}
+```
+
+Ahora creará una nueva instancia de su clase y probará la configuración y obtendrá la propiedad de instancia `name`:
+
+
+```ts
+const allowlist = ["Jon", "Jane"];
+
+const allowlistOnly = (target: any, memberName: string) => {
+  let currentValue: any = target[memberName];
+
+  Object.defineProperty(target, memberName, {
+    set: (newValue: any) => {
+      if (!allowlist.includes(newValue)) {
+        return;
+      }
+      currentValue = newValue;
+    },
+    get: () => currentValue
+  });
+};
+
+class Person {
+  @allowlistOnly
+  name: string = "Jon";
+}
+
+const person = new Person();
+console.log(person.name);
+
+person.name = "Peter";
+console.log(person.name);
+
+person.name = "Jane";
+console.log(person.name);
+```
+
+Al ejecutar el código, debería ver el siguiente resultado:
+
+
+```sh
+Output
+Jon
+Jon
+Jane
+```
+
+El valor nunca se establece en `Peter`, ya que `Peter` no está en la lista de permitidos.
+
+¿Qué pasaría si quisiera hacer que su código sea un poco más reutilizable, permitiendo que se establezca la lista de permitidos al aplicar el decorador? Este es un gran caso de uso para las fábricas de decoradores. Hagamos exactamente eso, convirtiendo su decorador `allowlistOnly` en una fábrica de decoradores:
+
+
+```ts
+const allowlistOnly = (allowlist: string[]) => {
+  return (target: any, memberName: string) => {
+    let currentValue: any = target[memberName];
+
+    Object.defineProperty(target, memberName, {
+      set: (newValue: any) => {
+        if (!allowlist.includes(newValue)) {
+          return;
+        }
+        currentValue = newValue;
+      },
+      get: () => currentValue
+    });
+  };
+}
+```
+
+Aquí envolvió su implementación anterior en otra función, una fábrica de decoradores. La fábrica de decoradores recibe un solo parámetro llamado `allowlist`, que es una matriz de cadenas.
+
+Ahora, para usar su decorador, debe pasar la lista de permitidos, como en el siguiente código resaltado:
+
+
+```ts{2}
+class Person {
+  @allowlistOnly(["Claire", "Oliver"])
+  name: string = "Claire";
+}
+```
+
+Intente ejecutar un código similar al anterior que escribió, pero con los nuevos cambios:
+
+
+```ts
+const allowlistOnly = (allowlist: string[]) => {
+  return (target: any, memberName: string) => {
+    let currentValue: any = target[memberName];
+
+    Object.defineProperty(target, memberName, {
+      set: (newValue: any) => {
+        if (!allowlist.includes(newValue)) {
+          return;
+        }
+        currentValue = newValue;
+      },
+      get: () => currentValue
+    });
+  };
+}
+
+class Person {
+  @allowlistOnly(["Claire", "Oliver"])
+  name: string = "Claire";
+}
+
+const person = new Person();
+console.log(person.name);
+person.name = "Peter";
+console.log(person.name);
+person.name = "Oliver";
+console.log(person.name);
+```
+
+El código debería darte el siguiente resultado:
+
+
+```sh
+Output
+Claire
+Claire
+Oliver
+```
+
+Demostrando que funciona como se esperaba, `person.name` nunca se establece a `Peter`, ya que `Peter` no está en la lista de permitidos dada.
+
+Ahora que creó su primer decorador de propiedades usando una función de decorador normal y una fábrica de decoradores, es hora de echar un vistazo a cómo crear decoradores para accesores de clase.
+
+## Creating Accessor Decorators
+
 
