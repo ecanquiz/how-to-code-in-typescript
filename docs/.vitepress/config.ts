@@ -24,6 +24,7 @@ export default defineConfig({
         { text: 'Cómo Usar Enumeraciones', link: '/how-to-use-enums' },     
         { text: 'Cómo Usar Clases', link: '/how-to-use-classes' },
         { text: 'Cómo Usar Decoradores', link: '/how-to-use-decorators' },
+        { text: 'Cómo usar Interfaces', link: '/how-to-use-interfaces' },
       ]
     }],
     socialLinks: [

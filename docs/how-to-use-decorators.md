@@ -629,4 +629,50 @@ Esto muestra que ambos métodos se empaquetaron correctamente con su función co
 Ahora ha creado su primer decorador de métodos usando TypeScript. La siguiente sección le mostrará cómo crear el último tipo de decorador compatible con TypeScript, un decorador de parámetros.
 
 
-## Creating Parameter Decorators
+## Creando Decoradores de Parámetros
+
+Los decoradores de parámetros se pueden usar en los parámetros del método de clase. En esta sección, aprenderá cómo crear uno.
+
+La función decoradora utilizada con parámetros recibe los siguientes parámetros:
+
+- Para propiedades estáticas, la función constructora de la clase. Para todas las demás propiedades, el prototipo de la clase.
+- El nombre del miembro.
+- El índice del parámetro en la lista de parámetros del método.
+
+No es posible cambiar nada relacionado con el parámetro en sí, por lo que estos decoradores solo son útiles para observar el uso del parámetro en sí (a menos que use algo más avanzado como [`reflect-metadata`](https://github.com/rbuckton/reflect-metadata)).
+
+Aquí hay un ejemplo de un decorador que imprime el índice del parámetro que fue decorado, junto con el nombre del método:
+
+
+```ts
+function print(target: Object, propertyKey: string, parameterIndex: number) {
+  console.log(`Decorating param ${parameterIndex} from ${propertyKey}`);
+}
+```
+
+
+Entonces puedes usar tu decorador de parámetros así:
+
+
+```ts
+class TestClass {
+  testMethod(param0: any, @print param1: any) {}
+}
+```
+
+Ejecutar el código anterior debería mostrar lo siguiente en la consola:
+
+
+```sh
+Output
+Decorating param 1 from testMethod
+```
+
+
+Ahora ha creado y ejecutado un decorador de parámetros e impreso el resultado que devuelve el índice del parámetro decorado.
+
+
+## Conclusión
+
+En este tutorial, implementó todos los decoradores compatibles con TypeScript, los usó con clases y aprendió las diferencias entre cada uno de ellos. Ahora puede comenzar a escribir sus propios decoradores para reducir el código repetitivo en su base de código, o usar decoradores con bibliotecas, como [Mobx](https://mobx.js.org/README.html), con más confianza.
+
