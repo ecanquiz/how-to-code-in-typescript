@@ -301,7 +301,91 @@ const data: DataRecord = {
 
 En esta sección, creó interfaces usando diferentes funciones disponibles en TypeScript y aprendió a usar las interfaces que creó. En la siguiente sección, aprenderá más sobre las diferencias entre las declaraciones `type` e `interface`, y ganará práctica con la fusión de declaración y aumento de módulo.
 
-## Differences Between Types and Interfaces
+## Diferencias entre Tipos e Interfaces
 
+Hasta ahora, ha visto que la declaración `interface` y la declaración `type` son similares y tienen casi el mismo conjunto de características.
+
+Por ejemplo, creó una interfaz `Logger` que se extendió desde una interfaz `Clearable`:
+
+
+```ts
+interface Clearable {
+  clear: () => void;
+}
+
+interface Logger extends Clearable {
+  log: (message: string) => void;
+}
+```
+
+La misma representación de tipo se puede replicar utilizando dos declaraciones `type`:
+
+
+```ts
+type Clearable = {
+  clear: () => void;
+}
+
+type Logger = Clearable & {
+  log: (message: string) => void;
+}
+```
+
+Como se mostró en las secciones anteriores, la declaración `interface` se puede usar para representar una variedad de objetos, desde funciones hasta objetos complejos con un número ilimitado de propiedades. Esto también es posible con declaraciones `type`, incluso extendiéndose desde otros tipos, ya que puede intersectar varios tipos usando el operador de intersección `&`.
+
+Dado que las declaraciones `type` y las declaraciones `interface` son tan similares, deberá considerar las características específicas únicas de cada una y ser consistente en su base de código. Elija uno para crear representaciones de tipo en su base de código, y solo use el otro cuando necesite una función específica que solo esté disponible para él.
+
+Por ejemplo, la declaración `type` tiene algunas características de las que carece la declaración `interface`, como:
+
+- Tipos de unión.
+- Tipos mapeados.
+- Alias a tipos primitivos.
+
+Una de las funciones disponibles solo para la declaración `interface` es la fusión de declaraciones, sobre la que aprenderá en la siguiente sección. Es importante tener en cuenta que la combinación de declaraciones puede ser útil si está escribiendo una biblioteca y desea dar a los usuarios de la biblioteca el poder de ampliar los tipos proporcionados por la biblioteca, ya que esto no es posible con las declaraciones `type`.
+
+
+## Fusión de Declaración
+
+TypeScript puede fusionar varias declaraciones en una sola, lo que le permite escribir varias declaraciones para la misma estructura de datos y que el compilador de TypeScript las agrupe durante la compilación como si fueran un solo tipo. En esta sección, verá cómo funciona esto y por qué es útil al usar interfaces.
+
+Las interfaces en TypeScript se pueden volver a abrir; es decir, se pueden combinar varias declaraciones de la misma interfaz. Esto es útil cuando desea agregar nuevos campos a una interfaz existente.
+
+Por ejemplo, imagina que tienes una interfaz llamada `DatabaseOptions` como la siguiente:
+
+
+```ts
+interface DatabaseOptions {
+  host: string;
+  port: number;
+  user: string;
+  password: string;
+}
+```
+
+Esta interfaz se utilizará para pasar opciones al conectarse a una base de datos.
+
+Más adelante en el código, declara una interfaz con el mismo nombre pero con un solo campo `string` llamado `dsnUrl`, como este:
+
+
+```ts
+interface DatabaseOptions {
+  dsnUrl: string;
+}
+```
+
+Cuando el Compilador de TypeScript comience a leer su código, fusionará todas las declaraciones de la interfaz de `DatabaseOptions` en una sola. Desde el punto de vista del Compilador de TypeScript, `DatabaseOptions` ahora es:
+
+
+```ts
+interface DatabaseOptions {
+  host: string;
+  port: number;
+  user: string;
+  password: string;
+  dsnUrl: string;
+}
+```
+
+La interfaz incluye todos los campos que declaró inicialmente, más el nuevo campo `dsnUrl` que declaró por separado. Ambas declaraciones se han fusionado.
 
 
