@@ -10,7 +10,7 @@ En [TypeScript](https://www.typescriptlang.org/), las _enumeraciones_ o tipos en
 
 Mientras que la mayoría de las funciones de TypeScript son útiles para generar errores durante la compilación, las enumeraciones también son útiles como estructuras de datos que pueden contener constantes para su código. TypeScript traduce enumeraciones en [objetos JavaScript](https://www.digitalocean.com/community/tutorials/understanding-objects-in-javascript) en el código final emitido por el compilador. Debido a esto, puede usar enumeraciones para hacer que una base de código sea más legible, ya que puede tener múltiples valores constantes agrupados en la misma estructura de datos, al mismo tiempo que hace que el código sea más seguro para los tipos que simplemente tener diferentes variables `const` por ahí.
 
-Este tutorial explicará la sintaxis que se usa para crear tipos de enumeración, el código JavaScript que el compilador de TypeScript crea bajo el capó, cómo extraer el tipo de objeto de enumeración y un caso de uso para enumeraciones que involucra banderas de bits en el desarrollo de juegos.
+Este tutorial explicará la sintaxis que se usa para crear tipos de enumeración, el código JavaScript que el Compilador de TypeScript crea bajo el capó, cómo extraer el tipo de objeto de enumeración y un caso de uso para enumeraciones que involucra banderas de bits en el desarrollo de juegos.
 
 ## Creando Enumeraciones en TypeScript
 
@@ -59,7 +59,7 @@ enum CardinalDirection {
 };
 ```
 
-El compilador de TypeScript asigna de forma predeterminada números a los miembros de la enumeración, pero puede anular esto para crear una enumeración de cadena. Estas son enumeraciones que tienen valores de cadena para cada miembro; estos son útiles cuando el valor debe tener un cierto significado legible por humanos, como si necesita leer el valor en un registro o mensaje de error más adelante.
+El Compilador de TypeScript asigna de forma predeterminada números a los miembros de la enumeración, pero puede anular esto para crear una enumeración de cadena. Estas son enumeraciones que tienen valores de cadena para cada miembro; estos son útiles cuando el valor debe tener un cierto significado legible por humanos, como si necesita leer el valor en un registro o mensaje de error más adelante.
 
 Puede declarar miembros de la enumeración para que tengan valores de cadena con el siguiente código:
 
@@ -95,7 +95,7 @@ enum CardinalDirection {
 ```
 
 
-Este se convierte en el siguiente código cuando se compila en JavaScript utilizando el compilador de TypeScript:
+Este se convierte en el siguiente código cuando se compila en JavaScript utilizando el Compilador de TypeScript:
 
 
 ```js
@@ -247,7 +247,7 @@ Si pasa un valor que no es compatible con el tipo de enumeración de su variable
 const direction: CardinalDirection = false;
 ```
 
-El compilador de TypeScript mostrará el error `2322`:
+El Compilador de TypeScript mostrará el error `2322`:
 
 
 ```sh
@@ -334,7 +334,7 @@ const test1: CardinalDirection = {
 }
 ```
 
-En este código, `test1` es un objeto de tipo `CardinalDirection` y el valor del objeto incluye todos los miembros de la enumeración. Sin embargo, el compilador de TypeScript mostrará el error `2322`:
+En este código, `test1` es un objeto de tipo `CardinalDirection` y el valor del objeto incluye todos los miembros de la enumeración. Sin embargo, el Compilador de TypeScript mostrará el error `2322`:
 
 
 ```sh
@@ -361,7 +361,7 @@ const test1: typeof CardinalDirection = {
 }
 ```
 
-El compilador de TypeScript ahora podrá compilar su código correctamente.
+El Compilador de TypeScript ahora podrá compilar su código correctamente.
 
 Esta sección mostró una forma específica de ampliar el uso de las enumeraciones. A continuación, trabajará en un caso de uso en el que se aplican las enumeraciones: banderas de bits en el desarrollo de juegos.
 

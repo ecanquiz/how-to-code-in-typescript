@@ -27,7 +27,7 @@ En este bloque de código, `language` es un [objeto](https://www.digitalocean.co
 
 TypeScript tiene como beneficio principal un sistema de tipo estricto. Un lenguaje tipificado _estáticamente_ es aquel en el que el tipo de las variables se conoce en el momento de la compilación. En esta sección, probará la sintaxis utilizada para especificar tipos de variables con TypeScript.
 
-Los tipos son información extra que escribes directamente en tu código. El compilador de TypeScript utiliza esta información adicional para imponer el uso correcto de los diferentes valores según su tipo.
+Los tipos son información extra que escribes directamente en tu código. El Compilador de TypeScript utiliza esta información adicional para imponer el uso correcto de los diferentes valores según su tipo.
 
 Imagina trabajar con un lenguaje dinámico, como JavaScript, y usar una variable `string` como si fuera un `number`. Cuando no tiene pruebas unitarias `strict`, el posible error solo aparecerá durante el tiempo de ejecución. Si usa el sistema de tipos disponible con TypeScript, el compilador no compilaría el código, dando un error como este:
 
@@ -241,7 +241,7 @@ Source has 3 element(s) but target allows only 2. (2322)
 
 ## `any`
 
-En ciertas situaciones, puede ser demasiado difícil especificar los tipos de un valor, como si ese valor proviene de una biblioteca de terceros o de un código que se escribió inicialmente sin TypeScript. Esto puede ser especialmente común cuando se migra un código base de JavaScript a TypeScript en pequeños pasos. En estos escenarios, es posible usar un tipo especial llamado `any`, que significa cualquier tipo. El uso de `any` significa excluirse de la verificación de tipos y es lo mismo que hacer que el compilador de TypeScript ignore ese valor.
+En ciertas situaciones, puede ser demasiado difícil especificar los tipos de un valor, como si ese valor proviene de una biblioteca de terceros o de un código que se escribió inicialmente sin TypeScript. Esto puede ser especialmente común cuando se migra un código base de JavaScript a TypeScript en pequeños pasos. En estos escenarios, es posible usar un tipo especial llamado `any`, que significa cualquier tipo. El uso de `any` significa excluirse de la verificación de tipos y es lo mismo que hacer que el Compilador de TypeScript ignore ese valor.
 
 Tome el siguiente bloque de código:
 
@@ -288,7 +288,7 @@ Si más adelante en el código desea comparar ese valor con algún otro `number`
 const isCodeGreaterThan100 = code > 100;
 ```
 
-El compilador de TypeScript mostrará el error `2571`:
+El Compilador de TypeScript mostrará el error `2571`:
 
 ```sh
 Output

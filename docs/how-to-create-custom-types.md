@@ -96,7 +96,7 @@ const ada: Programmer = {
 };
 ```
 
-El compilador de TypeScript (`tsc`) mostrará el error `2322`:
+El Compilador de TypeScript (`tsc`) mostrará el error `2322`:
 
 
 ```sh
@@ -118,7 +118,7 @@ const ada: Programmer = {
 };
 ```
 
-El compilador de TypeScript dará el error `2741`:
+El Compilador de TypeScript dará el error `2741`:
 
 
 ```ts
@@ -322,7 +322,7 @@ Si una matriz tiene menos de dos elementos de cadena, no será válida, como la 
 const invalidArray: MergeStringsArray = ['some-string']
 ```
 
-El compilador de TypeScript dará el error `2322` al verificar esta matriz:
+El Compilador de TypeScript dará el error `2322` al verificar esta matriz:
 
 
 ```sh
@@ -444,7 +444,7 @@ type StringThatStartsWithGet = `get${string}`;
 const invalidStringValue: StringThatStartsWithGet = 'something';
 ```
 
-El compilador de TypeScript le daría el error `2322`:
+El Compilador de TypeScript le daría el error `2322`:
 
 ```sh
 Output

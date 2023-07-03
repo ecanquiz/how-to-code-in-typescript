@@ -166,7 +166,7 @@ const mrUserFullName = getUserFullName(user, 'Mr. ');
 
 En este caso, el valor de `userFullName` será `Jon Doe` y el valor de `mrUserFullName` será `Mr. Jon Doe`.
 
-Tenga en cuenta que no puede agregar un parámetro opcional antes de uno requerido; debe aparecer en último lugar en la serie, como se hace con `(user: User, prefix?: string)`. Enumerarlo primero haría que el compilador de TypeScript devolviera el error `1016`:
+Tenga en cuenta que no puede agregar un parámetro opcional antes de uno requerido; debe aparecer en último lugar en la serie, como se hace con `(user: User, prefix?: string)`. Enumerarlo primero haría que el Compilador de TypeScript devolviera el error `1016`:
 
 
 ```sh
@@ -375,7 +375,7 @@ async function runProgram() {
 ```
 
 :::tip Nota
-Está utilizando una función contenedora denominada `runProgram` porque no puede utilizar `await` en el nivel superior de un archivo. Si lo hace, el compilador de TypeScript emitirá el error `1375`:
+Está utilizando una función contenedora denominada `runProgram` porque no puede utilizar `await` en el nivel superior de un archivo. Si lo hace, el Compilador de TypeScript emitirá el error `1375`:
 
 ```ts
 Output
@@ -449,7 +449,7 @@ Si llama a su función usando algo que no sea un número, como:
 const sumResult = sum(2, "b", 6, 8);
 ```
 
-El compilador de TypeScript emitirá el error `2345`:
+El Compilador de TypeScript emitirá el error `2345`:
 
 
 ```sh
@@ -693,7 +693,7 @@ function isString(value: any): value is string {
 processArray(valuesArray.filter(isString))
 ```
 
-Ahora el compilador de TypeScript infiere correctamente que la matriz pasada a `processArray` solo contiene cadenas y su código se compila correctamente.
+Ahora el Compilador de TypeScript infiere correctamente que la matriz pasada a `processArray` solo contiene cadenas y su código se compila correctamente.
 
 ## Conclusión
 

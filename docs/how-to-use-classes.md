@@ -87,7 +87,7 @@ El parámetro en el constructor no es opcional aquí. Esto significa que cuando 
 const unknownPerson = new Person;
 ```
 
-El compilador de TypeScript dará el error `2554`:
+El Compilador de TypeScript dará el error `2554`:
 
 
 ```sh
@@ -328,7 +328,7 @@ class ConsoleLogger implements Logger, Clearable {
 Tenga en cuenta que también debe agregar el método `clear` para asegurarse de que la clase se adhiera a la nueva interfaz.
 
 
-Si no proporcionó la implementación para uno de los miembros requeridos por cualquiera de las interfaces, como el método `debug` de la interfaz `Logger`, el compilador de TypeScript le daría el error `2420`:
+Si no proporcionó la implementación para uno de los miembros requeridos por cualquiera de las interfaces, como el método `debug` de la interfaz `Logger`, el Compilador de TypeScript le daría el error `2420`:
 
 
 ```sh
@@ -338,7 +338,7 @@ Class 'ConsoleLogger' incorrectly implements interface 'Logger'.
 ```
 
 
-El compilador de TypeScript también mostraría un error si su implementación no coincidiera con la esperada por la interfaz que está implementando. Por ejemplo, si cambió el tipo del parámetro `message` en el método `debug` de `string` a `number`, recibiría el error `2416`:
+El Compilador de TypeScript también mostraría un error si su implementación no coincidiera con la esperada por la interfaz que está implementando. Por ejemplo, si cambió el tipo del parámetro `message` en el método `debug` de `string` a `number`, recibiría el error `2416`:
 
 
 ```sh
@@ -448,7 +448,7 @@ const fileStream = new FileStream();
 En este ejemplo, la instancia `fileStream` automáticamente tiene disponible el método `copy`. La clase `FileStream` también tuvo que implementar un método `read` y un `write` explícitamente para adherirse a la clase abstracta `Stream`.
 
 
-Si olvidó implementar uno de los miembros abstractos de la clase abstracta de la que se está extendiendo, como no agregar la implementación `write` en su clase `FileStream`, el compilador de TypeScript arrojaría el error `2515`:
+Si olvidó implementar uno de los miembros abstractos de la clase abstracta de la que se está extendiendo, como no agregar la implementación `write` en su clase `FileStream`, el Compilador de TypeScript arrojaría el error `2515`:
 
 
 ```sh
@@ -456,7 +456,7 @@ Output
 Non-abstract class 'FileStream' does not implement inherited abstract member 'write' from class 'Stream'. (2515)
 ```
 
-El compilador de TypeScript también mostraría un error si implementara alguno de los miembros incorrectamente, como cambiar el tipo del primer parámetro del método `write` para que sea de tipo `string` en lugar de `Buffer`:
+El Compilador de TypeScript también mostraría un error si implementara alguno de los miembros incorrectamente, como cambiar el tipo del primer parámetro del método `write` para que sea de tipo `string` en lugar de `Buffer`:
 
 
 ```sh
@@ -603,7 +603,7 @@ financeEmployee.identifier;
 ```
 
 
-El compilador de TypeScript nos daría el error `2445`:
+El Compilador de TypeScript nos daría el error `2445`:
 
 
 ```sh
@@ -661,7 +661,7 @@ class FinanceEmployee extends Employee {
 ```
 
 
-Este código ahora hará que el compilador de TypeScript muestre el error `2341`:
+Este código ahora hará que el Compilador de TypeScript muestre el error `2341`:
 
 
 ```sh
@@ -671,7 +671,7 @@ Property 'identifier' is private and only accessible within class 'Employee'. (2
 
 Esto sucede porque está accediendo a la propiedad `identifier` en la subclase `FinanceEmployee`, y esto no está permitido, ya que la propiedad `identifier` se declaró en la clase `Employee` y tiene su visibilidad configurada como `private`.
 
-Recuerde que TypeScript se compila en JavaScript sin procesar que, por sí mismo, no tiene forma de especificar la visibilidad de los miembros de una clase. Como tal, TypeScript no tiene protección contra dicho uso durante el tiempo de ejecución. Esta es una verificación de seguridad realizada por el compilador de TypeScript solo durante la compilación.
+Recuerde que TypeScript se compila en JavaScript sin procesar que, por sí mismo, no tiene forma de especificar la visibilidad de los miembros de una clase. Como tal, TypeScript no tiene protección contra dicho uso durante el tiempo de ejecución. Esta es una verificación de seguridad realizada por el Compilador de TypeScript solo durante la compilación.
 
 Ahora que ha probado los modificadores de visibilidad, puede pasar a las funciones de flecha como métodos en las clases de TypeScript.
 
@@ -853,7 +853,7 @@ const warehouse = new Warehouse("abc");
 printEmployeeIdentifier(warehouse);
 ```
 
-El compilador de TypeScript no se quejaría. Incluso podría usar solo un objeto normal en lugar de la instancia de una clase. Como esto puede dar lugar a un comportamiento que no espera un programador que acaba de empezar con TypeScript, es importante estar atento a estos escenarios.
+El Compilador de TypeScript no se quejaría. Incluso podría usar solo un objeto normal en lugar de la instancia de una clase. Como esto puede dar lugar a un comportamiento que no espera un programador que acaba de empezar con TypeScript, es importante estar atento a estos escenarios.
 
 Con los conceptos básicos de usar una clase como un tipo fuera de la forma, ahora puede aprender a buscar clases específicas, en lugar de solo la forma.
 
@@ -939,7 +939,7 @@ const marketing = new MarketingEmployee("mkt-123");
 marketing.isSameEmployeeAs(finance);
 ```
 
-Al compilar este código, el compilador de TypeScript ahora mostrará el error `2345`:
+Al compilar este código, el Compilador de TypeScript ahora mostrará el error `2345`:
 
 
 ```sh
@@ -973,7 +973,7 @@ function createEmployee(ctor: Employee) {
 }
 ```
 
-En este fragmento, crea la clase `Employee`, inicializa el `identifier` y crea una función que instancia una clase basada en un parámetro de constructor `ctor` que tiene la forma de `Employee`. Pero si intentara compilar este código, el compilador de TypeScript daría el error `2351`:
+En este fragmento, crea la clase `Employee`, inicializa el `identifier` y crea una función que instancia una clase basada en un parámetro de constructor `ctor` que tiene la forma de `Employee`. Pero si intentara compilar este código, el Compilador de TypeScript daría el error `2351`:
 
 
 ```sh
@@ -1018,7 +1018,7 @@ function createEmployee(ctor: typeof Employee) {
 }
 ```
 
-El compilador de TypeScript ahora dará el error `2511`:
+El Compilador de TypeScript ahora dará el error `2511`:
 
 
 ```sh
@@ -1076,7 +1076,7 @@ createEmployee(FinanceEmployee);
 createEmployee(MarketingEmployee);
 ```
 
-El compilador de TypeScript ahora compilará correctamente su código.
+El Compilador de TypeScript ahora compilará correctamente su código.
 
 
 ## Conclusión
