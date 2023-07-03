@@ -137,4 +137,138 @@ interface StringList extends Clearable {
 Las interfaces pueden extenderse desde cualquier tipo de objeto, como interfaces, tipos normales e incluso [clases](./how-to-use-classes.html).
 
 
-## Interfaces with Callable Signature
+## Interfaces con Firma Invocable
+
+Si la interfaz también es invocable (es decir, también es una función), puede transmitir esa información en la declaración de la interfaz creando una firma invocable.
+
+Una firma invocable se crea agregando una declaración de función dentro de la interfaz que no está vinculada a ningún miembro y usando `:` en lugar de `=>` al establecer el tipo de devolución de la función.
+
+Como ejemplo, agregue una firma invocable a su interfaz `Logger`, como en el código resaltado a continuación:
+
+
+```ts{2}
+interface Logger {
+  (message: string): void;
+  log: (message: string) => void;
+}
+```
+
+
+Tenga en cuenta que la firma invocable se asemeja a la declaración de tipo de una función anónima, pero en el tipo de devolución está utilizando `:` en lugar de `=>`. Esto significa que cualquier valor vinculado al tipo de interfaz `Logger` se puede llamar directamente como una función.
+
+
+Para crear un valor que coincida con su interfaz `Logger`, debe considerar los requisitos de la interfaz:
+
+1. Debe ser invocable.
+2. Debe tener una propiedad llamada `log` que es una función que acepta un solo parámetro `string`.
+
+
+Vamos a crear una variable llamada `logger` que se pueda asignar al tipo de su interfaz `Logger`:
+
+
+```ts
+interface Logger {
+  (message: string): void;
+  log: (message: string) => void;
+}
+
+const logger: Logger = (message: string) => {
+  console.log(message);
+}
+logger.log = (message: string) => {
+  console.log(message);
+}
+```
+
+Para que coincida con la interfaz `Logger`, el valor debe poder ser invocable, es por eso que asigna la variable `logger` a una función:
+
+
+```ts{6,7,8}
+interface Logger {
+  (message: string): void;
+  log: (message: string) => void;
+}
+
+const logger: Logger = (message: string) => {
+  console.log(message);
+}
+logger.log = (message: string) => {
+  console.log(message);
+}
+```
+
+
+Luego está agregando la propiedad `log` a la función `logger`:
+
+
+```ts{9,10,11}
+interface Logger {
+  (message: string): void;
+  log: (message: string) => void;
+}
+
+const logger: Logger = (message: string) => {
+  console.log(message);
+}
+logger.log = (message: string) => {
+  console.log(message);
+}
+```
+
+Esto es requerido por la interfaz `Logger`. Los valores vinculados a la interfaz `Logger` también deben tener una propiedad `log` que sea una función que acepte un único parámetro `string` y que devuelva `void`.
+
+Si no incluyó la propiedad `log`, el Compilador de TypeScript le daría el error `2741`:
+
+
+```sh
+Output
+Property 'log' is missing in type '(message: string) => void' but required in type 'Logger'. (2741)
+```
+
+El Compilador de TypeScript emitiría un error similar si la propiedad `log` en la variable `logger` tuviera una firma de tipo incompatible, como establecerla en `true`:
+
+
+```ts{9}
+interface Logger {
+  (message: string): void;
+  log: (message: string) => void;
+}
+
+const logger: Logger = (message: string) => {
+  console.log(message);
+}
+logger.log = true;
+```
+
+En este caso, el Compilador de TypeScript mostraría el error `2322`:
+
+
+```sh
+Output
+Type 'boolean' is not assignable to type '(message: string) => void'. (2322)
+```
+
+Una buena característica de configurar las variables para que tengan un tipo específico, en este caso configurar la variable `logger` para que tenga el tipo de la interfaz `Logger`, es que TypeScript ahora puede inferir el tipo de los parámetros tanto de la función `logger` como de la función en la propiedad `log`.
+
+Puede verificar eso eliminando la información de tipo del argumento de ambas funciones. Tenga en cuenta que en el código resaltado a continuación, los parámetros `message` no tienen un tipo:
+
+
+```ts
+interface Logger {
+  (message: string): void;
+  log: (message: string) => void;
+}
+
+const logger: Logger = (message) => {
+  console.log(message);
+}
+logger.log = (message) => {
+  console.log(message);
+}
+```
+
+Y en ambos casos, su editor aún debería poder mostrar que el tipo del parámetro es un `string`, ya que este es el tipo esperado por la interfaz `Logger`.
+
+
+## Interfaces with Index Signatures
+
