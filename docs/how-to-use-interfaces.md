@@ -270,5 +270,38 @@ logger.log = (message) => {
 Y en ambos casos, su editor aún debería poder mostrar que el tipo del parámetro es un `string`, ya que este es el tipo esperado por la interfaz `Logger`.
 
 
-## Interfaces with Index Signatures
+## Interfaces con Firmas de Índice
+
+Puede agregar una firma de índice a su interfaz, al igual que con los tipos normales, lo que permite que la interfaz tenga un número ilimitado de propiedades.
+
+Por ejemplo, si desea crear una interfaz `DataRecord` que tenga un número ilimitado de campos `string`, puede usar la siguiente firma de índice resaltada:
+
+
+```ts{2}
+interface DataRecord {
+  [key: string]: string;
+}
+```
+
+A continuación, puede utilizar la interfaz `DataRecord` para establecer el tipo de cualquier objeto que tenga varios parámetros de tipo `string`:
+
+
+```ts
+interface DataRecord {
+  [key: string]: string;
+}
+
+const data: DataRecord = {
+  fieldA: "valueA",
+  fieldB: "valueB",
+  fieldC: "valueC",
+  // ...
+};
+```
+
+En esta sección, creó interfaces usando diferentes funciones disponibles en TypeScript y aprendió a usar las interfaces que creó. En la siguiente sección, aprenderá más sobre las diferencias entre las declaraciones `type` e `interface`, y ganará práctica con la fusión de declaración y aumento de módulo.
+
+## Differences Between Types and Interfaces
+
+
 
