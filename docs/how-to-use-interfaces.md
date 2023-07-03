@@ -75,4 +75,66 @@ Type '{ log: (message: string) => void; otherProp: boolean; }' is not assignable
 
 Similar al uso de declaraciones `type` normales, las propiedades se pueden convertir en una propiedad opcional agregando `?` a su nombre.
 
-## Extending Other Types
+## Extendiendo Otros Tipos
+
+Al crear interfaces, puede extender desde diferentes tipos de objetos, lo que permite que sus interfaces incluyan toda la información de tipo de los tipos extendidos. Esto le permite escribir interfaces pequeñas con un conjunto común de campos y utilizarlos como bloques de construcción para crear nuevas interfaces.
+
+Imagina que tienes una interfaz `Clearable`, como esta:
+
+
+```ts
+interface Clearable {
+  clear: () => void;
+}
+```
+
+
+A continuación, podría crear una nueva interfaz que se extienda a partir de ella, heredando todos sus campos. En el siguiente ejemplo, la interfaz `Logger` se extiende desde la interfaz `Clearable`. Observe las líneas resaltadas:
+
+
+```ts{5}
+interface Clearable {
+  clear: () => void;
+}
+
+interface Logger extends Clearable {
+  log: (message: string) => void;
+}
+```
+
+La interfaz `Logger` ahora también tiene un miembro `clear`, que es una función que no acepta parámetros y devuelve `void`. Este nuevo miembro se hereda de la interfaz `Clearable`. Es lo mismo que si hiciéramos esto:
+
+
+```ts
+interface Logger {
+  log: (message: string) => void;
+  clear: () => void;
+}
+```
+
+Al escribir muchas interfaces con un conjunto común de campos, puede extraerlas a una interfaz diferente y cambiar sus interfaces para que se extiendan desde la nueva interfaz que creó.
+
+Volviendo al ejemplo `Clearable` utilizado anteriormente, imagina que tu aplicación necesita una interfaz diferente, como la siguiente interfaz `StringList`, para representar una estructura de datos que contiene varias cadenas:
+
+
+```ts
+interface StringList {
+  push: (value: string) => void;
+  get: () => string[];
+}
+```
+
+Al hacer que esta nueva interfaz `StringList` extienda la interfaz `Clearable` existente, está especificando que esta interfaz también tiene los miembros establecidos en la interfaz `Clearable`, agregando la propiedad `clear` a la definición de tipo de la interfaz `StringList`:
+
+
+```ts
+interface StringList extends Clearable {
+  push: (value: string) => void;
+  get: () => string[];
+}
+```
+
+Las interfaces pueden extenderse desde cualquier tipo de objeto, como interfaces, tipos normales e incluso [clases](./how-to-use-classes.html).
+
+
+## Interfaces with Callable Signature
