@@ -389,3 +389,72 @@ interface DatabaseOptions {
 La interfaz incluye todos los campos que declaró inicialmente, más el nuevo campo `dsnUrl` que declaró por separado. Ambas declaraciones se han fusionado.
 
 
+## Aumento de Módulos
+
+La fusión de declaraciones es útil cuando necesita aumentar los módulos existentes con nuevas propiedades. Un caso de uso para eso es cuando agrega más campos a una estructura de datos proporcionada por una biblioteca. Esto es relativamente común con la [biblioteca Node.js llamada `express`](https://expressjs.com/), que le permite crear servidores HTTP.
+
+Cuando se trabaja con `express`, se pasan un objeto `Request` y `Response` a sus manejadores de solicitudes (funciones responsables de proporcionar una respuesta a una solicitud HTTP). El objeto `Request` se usa comúnmente para almacenar datos específicos de una solicitud en particular. Por ejemplo, podría usarlo para almacenar el usuario registrado que realizó la solicitud HTTP inicial:
+
+
+```ts{2}
+const myRoute = (req: Request, res: Response) => {
+  res.json({ user: req.user });
+}
+```
+
+Aquí, el controlador de solicitudes devuelve al cliente un `json` con el campo `user` establecido en el usuario registrado. El usuario registrado se agrega al objeto de solicitud en otro lugar del código, utilizando un _middleware_ de _express_ responsable de la autenticación del usuario.
+
+Las definiciones de tipo para la interfaz `Request` en sí no tienen un campo `user`, por lo que el código anterior daría el error de tipo `2339`:
+
+
+```sh
+Property 'user' does not exist on type 'Request'. (2339)
+```
+
+Para arreglar eso, debe crear un aumento de módulo para el paquete `express`, aprovechando la combinación de declaraciones para agregar una nueva propiedad a la interfaz `Request`.
+
+
+Si verifica el tipo del objeto `Request` en la declaración de tipo `express`, notará que es una interfaz agregada dentro de un espacio de nombres global llamado `Express`, como se muestra en la documentación del [repositorio DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/70c3f0558f295a5bf5ba98d649509da21e5b12ae/types/express-serve-static-core/index.d.ts#L17-L25):
+
+
+```ts
+declare global {
+    namespace Express {
+        // These open interfaces may be extended in an application-specific manner via declaration merging.
+        // See for example method-override.d.ts (https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/method-override/index.d.ts)
+        interface Request {}
+        interface Response {}
+        interface Application {}
+    }
+}
+```
+
+:::tip Nota
+Los archivos de declaración de tipo son archivos que solo contienen información de tipo. El repositorio DefinitelyTyped es el repositorio oficial para enviar declaraciones de tipo para paquetes que no tienen uno. Los paquetes `@types/<package>` disponibles en npm se publican desde este repositorio.
+:::
+
+
+Para usar el aumento de módulo para agregar una nueva propiedad a la interfaz `Request`, debe replicar la misma estructura en un archivo de declaración de tipo local. Por ejemplo, imagine que creó un archivo llamado `express.d.ts` como el siguiente y luego lo agregó a la opción `types` de su `tsconfig.json`:
+
+
+```ts
+import 'express';
+
+declare global {
+  namespace Express {
+    interface Request {
+      user: {
+        name: string;
+      }
+    }
+  }
+}
+```
+
+Desde el punto de vista del Compilador de TypeScript, la interfaz `Request` tiene una propiedad `user`, con su tipo establecido en un objeto que tiene una sola propiedad llamada `name` de tipo `string`. Esto sucede porque se fusionan todas las declaraciones para la misma interfaz.
+
+Supongamos que está creando una biblioteca y desea brindar a los usuarios de su biblioteca la opción de aumentar los tipos proporcionados por su propia biblioteca, como lo hizo anteriormente con `express`. En ese caso, debe exportar las interfaces de su biblioteca, ya que las declaraciones `type` normales no admiten el aumento de módulos.
+
+## Conclusión
+
+En este tutorial, escribió varias interfaces de TypeScript para representar varias estructuras de datos, descubrió cómo puede usar diferentes interfaces juntas como bloques de construcción para crear tipos potentes y aprendió las diferencias entre las declaraciones de tipos normales y las interfaces. Ahora puede comenzar a escribir interfaces para estructuras de datos en su base de código, lo que le permite tener código con seguridad de tipos y documentación.

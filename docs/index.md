@@ -32,7 +32,8 @@ features:
     details: Los decoradores son una forma de decorar miembros de una clase, o una clase en sí misma, con funcionalidad adicional. Este tutorial cubre la creación de decoradores en TypeScript para clases y miembros de clase, y también cómo usarlos.
   - title: Cómo Usar Interfaces en TypeScript
     details: TypeScript ofrece múltiples formas de representar objetos en su código, una de las cuales es usar interfaces. Las interfaces en TypeScript tienen dos escenarios de uso, puede crear un contrato que deben seguir las clases, como los miembros que esas clases deben implementar, y también puede representar tipos en su aplicación, al igual que la declaración de tipo normal. Puede notar que las interfaces y los tipos comparten un conjunto similar de características. En este tutorial, creará interfaces en TypeScript, aprenderá a usarlas y comprenderá las diferencias entre los tipos normales y las interfaces.
-    
+  - title: Cómo Usar Genéricos en TypeScript
+    details: TypeScript es totalmente compatible con los genéricos como una forma de introducir la seguridad de tipos en los componentes que aceptan argumentos y devuelven valores cuyo tipo será indeterminado hasta que se consuman más adelante en su código. En este tutorial, probará ejemplos del mundo real de genéricos de TypeScript y explorará cómo se usan en funciones, tipos, clases e interfaces. También usará genéricos para crear tipos asignados y tipos condicionales, lo que lo ayudará a crear componentes de TypeScript que tengan la flexibilidad de aplicarse a todas las situaciones necesarias en su código.
 footer: MIT Licensed | Copyleft © 2023-present Ernesto Canquiz
 ---
 
