@@ -9,7 +9,7 @@ Crear y usar funciones es un aspecto fundamental de cualquier lenguaje de progra
 
 En este tutorial, comenzará creando las funciones más básicas con información de tipo, luego pasará a escenarios más complejos, como el uso de [resto de parámetros](https://www.digitalocean.com/community/tutorials/understanding-destructuring-rest-parameters-and-spread-syntax-in-javascript) y la sobrecarga de funciones. Probarás diferentes ejemplos de código, que puedes seguir en tu propio entorno de TypeScript o en [TypeScript Playground](https://www.typescriptlang.org/play?ts=4.2.2#), un entorno en línea que te permite escribir TypeScript directamente en el navegador.
 
-## Creación de Funciones Tipificadas
+## Crear Funciones Tipificadas
 
 En esta sección, creará funciones en TypeScript y luego les agregará información de tipo.
 
@@ -280,7 +280,7 @@ eventCallback: (target: EventTarget) => void
 Esto significa que su función `onEvent` espera que se pase otra función en el parámetro `eventCallback`. Esta función debería aceptar un solo argumento del tipo `EventTarget`. El tipo de retorno de esta función es ignorado por su función `onEvent`, por lo que está utilizando [`void`](./how-to-use-basic-types.html) como tipo.
 
 
-## Uso de Funciones Asincrónicas Tipadas
+## Usar Funciones Asincrónicas Tipadas
 
 Cuando se trabaja con JavaScript, es relativamente común tener [funciones asíncronas](https://www.digitalocean.com/community/tutorials/understanding-the-event-loop-callbacks-promises-and-async-await-in-javascript). TypeScript tiene una forma específica de lidiar con esto. En esta sección, creará funciones asincrónicas en TypeScript.
 

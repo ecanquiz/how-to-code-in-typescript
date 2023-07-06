@@ -18,7 +18,7 @@ Las interfaces en TypeScript son una forma poderosa de representar estructuras d
 En este tutorial, creará interfaces en TypeScript, aprenderá a usarlas y comprenderá las diferencias entre los tipos normales y las interfaces. Probarás diferentes ejemplos de código, que puedes seguir en tu propio entorno de TypeScript o en [TypeScript Playground](https://www.typescriptlang.org/play?ts=4.2.2#), un entorno en línea que te permite escribir TypeScript directamente en el navegador.
 
 
-## Creación y Uso de Interfaces en TypeScript
+## Crear y Usar Interfaces en TypeScript
 
 En esta sección, creará interfaces utilizando diferentes funciones disponibles en TypeScript. También aprenderá a utilizar las interfaces que ha creado.
 
@@ -75,7 +75,7 @@ Type '{ log: (message: string) => void; otherProp: boolean; }' is not assignable
 
 Similar al uso de declaraciones `type` normales, las propiedades se pueden convertir en una propiedad opcional agregando `?` a su nombre.
 
-## Extendiendo Otros Tipos
+## Extender Otros Tipos
 
 Al crear interfaces, puede extender desde diferentes tipos de objetos, lo que permite que sus interfaces incluyan toda la información de tipo de los tipos extendidos. Esto le permite escribir interfaces pequeñas con un conjunto común de campos y utilizarlos como bloques de construcción para crear nuevas interfaces.
 
@@ -344,7 +344,7 @@ Por ejemplo, la declaración `type` tiene algunas características de las que ca
 Una de las funciones disponibles solo para la declaración `interface` es la fusión de declaraciones, sobre la que aprenderá en la siguiente sección. Es importante tener en cuenta que la combinación de declaraciones puede ser útil si está escribiendo una biblioteca y desea dar a los usuarios de la biblioteca el poder de ampliar los tipos proporcionados por la biblioteca, ya que esto no es posible con las declaraciones `type`.
 
 
-## Fusión de Declaración
+## Fusionar Declaraciones
 
 TypeScript puede fusionar varias declaraciones en una sola, lo que le permite escribir varias declaraciones para la misma estructura de datos y que el compilador de TypeScript las agrupe durante la compilación como si fueran un solo tipo. En esta sección, verá cómo funciona esto y por qué es útil al usar interfaces.
 
@@ -389,7 +389,7 @@ interface DatabaseOptions {
 La interfaz incluye todos los campos que declaró inicialmente, más el nuevo campo `dsnUrl` que declaró por separado. Ambas declaraciones se han fusionado.
 
 
-## Aumento de Módulos
+## Aumentar Módulos
 
 La fusión de declaraciones es útil cuando necesita aumentar los módulos existentes con nuevas propiedades. Un caso de uso para eso es cuando agrega más campos a una estructura de datos proporcionada por una biblioteca. Esto es relativamente común con la [biblioteca Node.js llamada `express`](https://expressjs.com/), que le permite crear servidores HTTP.
 

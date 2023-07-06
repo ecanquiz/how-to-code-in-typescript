@@ -10,7 +10,7 @@ Las clases son una abstracción común utilizada en los lenguajes de [programaci
 
 Este tutorial repasará la sintaxis utilizada para crear clases, las diferentes funciones disponibles y cómo se tratan las clases en TypeScript durante la verificación de tipos en tiempo de compilación. Lo guiará a través de ejemplos con diferentes ejemplos de código, que puede seguir junto con su propio entorno de TypeScript.
 
-## Creación de Clases en TypeScript
+## Crear Clases en TypeScript
 
 En esta sección, verá ejemplos de la sintaxis utilizada para crear clases en TypeScript. Si bien cubrirá algunos de los aspectos fundamentales de la creación de clases con TypeScript, la sintaxis es prácticamente la misma que se usa para [crear clases con JavaScript](https://www.digitalocean.com/community/tutorials/understanding-classes-in-javascript). Debido a esto, este tutorial se centrará en algunas de las funciones distintivas disponibles en TypeScript.
 
@@ -248,7 +248,7 @@ TypeScript ofrece la capacidad completa de la herencia de clases de JavaScript, 
 
 En esta sección, verá algunos ejemplos de cómo se pueden usar las interfaces y las clases abstractas para construir y crear verificaciones de tipos para las clases.
 
-## Implementando Interfaces
+## Implementar Interfaces
 
 Las interfaces son útiles para especificar un conjunto de comportamientos que deben poseer todas las implementaciones de esa interfaz. Las interfaces se crean utilizando la palabra clave `interface` seguida del nombre de la interfaz y, a continuación, el cuerpo de la interfaz. Como ejemplo, cree una interfaz `Logger` que podría usarse para registrar datos importantes sobre cómo se ejecuta su programa:
 
@@ -349,7 +349,7 @@ Property 'debug' in type 'ConsoleLogger' is not assignable to the same property 
       Type 'string' is not assignable to type 'number'. (2416)
 ```
 
-## Construyendo sobre Clases Abstractas
+## Construir sobre Clases Abstractas
 
 Las clases abstractas son similares a las clases normales, con dos diferencias principales: no se pueden instanciar directamente y pueden contener _miembros abstractos_. Los miembros abstractos son miembros que deben implementarse en las clases heredadas. No tienen una implementación en la propia clase abstracta. Esto es útil porque puede tener alguna funcionalidad común en la clase abstracta base e implementaciones más específicas en las clases heredadas. Cuando marca una clase como abstracta, está diciendo que a esta clase le falta una funcionalidad que debería implementarse en las clases heredadas.
 
@@ -783,7 +783,7 @@ abc-123
 Esto demuestra cómo TypeScript le permite usar funciones de flecha como valores directos de métodos de clase. En la siguiente sección, aprenderá cómo hacer cumplir las clases con la verificación de tipos de TypeScript.
 
 
-## Usando Clases como Tipos
+## Usar Clases como Tipos
 
 Hasta ahora, este tutorial ha cubierto cómo crear clases y usarlas directamente. En esta sección, utilizará clases como tipos cuando trabaje con TypeScript.
 
