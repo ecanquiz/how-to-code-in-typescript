@@ -43,7 +43,7 @@ Al trabajar en un proyecto que tiene un archivo `tsconfig.json`, para habilitar 
 
 En TypeScript Playground, los decoradores están habilitados de forma predeterminada.
 
-## Usando Sintaxis del Decorador
+## Usar Sintaxis del Decorador
 
 En esta sección, aplicará decoradores en clases de TypeScript.
 
@@ -96,7 +96,7 @@ Para agregar varios decoradores, agréguelos juntos, uno tras otro:
 class Person {}
 ```
 
-## Creando Decoradores de Clase en TypeScript
+## Crear Decoradores de Clase en TypeScript
 
 En esta sección, seguirá los pasos para crear decoradores de clase en TypeScript.
 
@@ -127,7 +127,7 @@ Si devolvió un valor en el decorador de clase `sealed`, este valor se convertir
 
 Ha creado su primer decorador y lo ha utilizado con una clase. En la siguiente sección aprenderá a crear fábricas de decoradores.
 
-## Creando Fábricas de Decoradores
+## Crear Fábricas de Decoradores
 
 A veces necesitarás pasar opciones adicionales al decorador al aplicarlo, y para eso, tienes que usar fábricas de decoradores. En esta sección, aprenderá cómo crear esas fábricas y usarlas.
 
@@ -188,7 +188,7 @@ Argument of type 'typeof Person' is not assignable to parameter of type 'boolean
 Acaba de crear una fábrica de decoradores que puede recibir parámetros y cambiar su comportamiento en función de estos parámetros. En el siguiente paso, aprenderá a crear decoradores de propiedades.
 
 
-## Creando Decoradores de Propiedades
+## Crear Decoradores de Propiedades
 
 Las propiedades de clase son otro lugar donde puede usar decoradores. En esta sección, verás cómo crearlos.
 
@@ -440,7 +440,7 @@ Demostrando que funciona como se esperaba, `person.name` nunca se establece a `P
 
 Ahora que creó su primer decorador de propiedades usando una función de decorador normal y una fábrica de decoradores, es hora de echar un vistazo a cómo crear decoradores para accesores de clase.
 
-## Creando Decoradores de Acceso
+## Crear Decoradores de Acceso
 
 En esta sección, verás cómo decorar accesos de clase.
 
@@ -484,7 +484,7 @@ class Person {
 
 Los decoradores de acceso son similares a los decoradores de propiedades. La única diferencia es que reciben un tercer parámetro con el descriptor de propiedad. Ahora que creó su primer decorador de acceso, la siguiente sección le mostrará cómo crear decoradores de método.
 
-## Creando de Decoradores de Métodos
+## Crear Decoradores de Métodos
 
 En esta sección, verá cómo usar los decoradores de métodos.
 
@@ -629,7 +629,7 @@ Esto muestra que ambos métodos se empaquetaron correctamente con su función co
 Ahora ha creado su primer decorador de métodos usando TypeScript. La siguiente sección le mostrará cómo crear el último tipo de decorador compatible con TypeScript, un decorador de parámetros.
 
 
-## Creando Decoradores de Parámetros
+## Crear Decoradores de Parámetros
 
 Los decoradores de parámetros se pueden usar en los parámetros del método de clase. En esta sección, aprenderá cómo crear uno.
 

@@ -12,7 +12,7 @@ Aunque los prefabricados [tipos básicos en TypeScript](./how-to-use-basic-types
 
 Este tutorial le mostrará cómo usar tipos personalizados con TypeScript, cómo componer esos tipos junto con uniones e intersecciones, y cómo usar tipos de utilidad para agregar flexibilidad a sus tipos personalizados. Lo guiará a través de diferentes ejemplos de código, que puede seguir en su propio entorno de TypeScript o en [TypeScript Playground](https://www.typescriptlang.org/play?ts=4.2.2#), un entorno en línea que le permite escribir TypeScript directamente en el navegador.
 
-## Creación de Tipos Personalizados
+## Crear Tipos Personalizados
 
 En los casos en que los programas tienen estructuras de datos complejas, es posible que el uso de los tipos básicos de TypeScript no describa completamente las estructuras de datos que está utilizando. En estos casos, declarar su propio tipo lo ayudará a abordar la complejidad. En esta sección, creará tipos que se pueden usar para describir cualquier forma de objeto que necesite usar en su código.
 
@@ -304,7 +304,7 @@ Esto significaría que un objeto de tipo `Data` debe tener una clave `status` co
 
 Ahora que puede crear un objeto con diferentes cantidades de elementos, puede continuar con el aprendizaje de las matrices en TypeScript, que pueden tener una cantidad personalizada de elementos o más.
 
-## Creación de Matrices con Número de Elementos o Más
+## Crear Matrices con Número de Elementos o Más
 
 Usando los [tipos básicos de matriz y tupla](./how-to-use-basic-types.html#tipos-basicos-utilizados-en-typescript) disponibles en TypeScript, puede crear tipos personalizados para matrices que deben tener una cantidad mínima de elementos. En esta sección, utilizará el [rest operator](https://www.digitalocean.com/community/tutorials/understanding-destructuring-rest-parameters-and-spread-syntax-in-javascript#rest-parameters) `...` de TypeScript para hacer esto.
 

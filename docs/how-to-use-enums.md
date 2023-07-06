@@ -12,7 +12,7 @@ Mientras que la mayoría de las funciones de TypeScript son útiles para generar
 
 Este tutorial explicará la sintaxis que se usa para crear tipos de enumeración, el código JavaScript que el Compilador de TypeScript crea bajo el capó, cómo extraer el tipo de objeto de enumeración y un caso de uso para enumeraciones que involucra banderas de bits en el desarrollo de juegos.
 
-## Creando Enumeraciones en TypeScript
+## Crear Enumeraciones en TypeScript
 
 En esta sección, verá un ejemplo de cómo declarar una _enumeración numérica_ y una _enumeración de cadena_.
 
@@ -213,7 +213,7 @@ Output
 Con una comprensión de cómo funcionan las enumeraciones bajo el capó en TypeScript, ahora pasará a usar enumeraciones para declarar tipos en su código.
 
 
-## Usando Enumeraciones en TypeScript
+## Usar Enumeraciones en TypeScript
 
 En esta sección, probará la sintaxis básica de asignar miembros de enumeración como tipos en su código TypeScript. Esto se puede hacer de la misma manera que se declaran los [tipos básicos](./how-to-use-basic-types.html).
 
@@ -366,7 +366,7 @@ El Compilador de TypeScript ahora podrá compilar su código correctamente.
 Esta sección mostró una forma específica de ampliar el uso de las enumeraciones. A continuación, trabajará en un caso de uso en el que se aplican las enumeraciones: banderas de bits en el desarrollo de juegos.
 
 
-## Usando Banderas de Bits con Enumeraciones de TypeScript
+## Usar Banderas de Bits con Enumeraciones de TypeScript
 
 En esta última sección del tutorial, analizará un caso de uso tangible para enumeraciones en TypeScript: [banderas de bits](https://en.wikipedia.org/wiki/Bit_field).
 

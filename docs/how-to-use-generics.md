@@ -98,5 +98,7 @@ Esto impone un tipo de devolución basado en los argumentos proporcionados a `pi
 Con una idea de cómo se crean los genéricos en TypeScript, ahora puede pasar a explorar el uso de genéricos en situaciones específicas. Este tutorial cubrirá primero cómo se pueden usar los genéricos en funciones.
 
 
-## Using Generics with Functions
+## Usar Genéricos con Funciones
+
+
 
