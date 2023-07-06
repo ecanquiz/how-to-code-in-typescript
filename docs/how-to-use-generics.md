@@ -100,5 +100,53 @@ Con una idea de cómo se crean los genéricos en TypeScript, ahora puede pasar a
 
 ## Usar Genéricos con Funciones
 
+Uno de los escenarios más comunes para usar genéricos con funciones es cuando tiene algún código que no se escribe fácilmente para todos los casos de uso. Para que la función se aplique a más situaciones, puede incluir escritura genérica. En este paso, ejecutará un ejemplo de una función `identity` para ilustrar esto. También explorará un ejemplo asíncrono de cuándo pasar parámetros de tipo directamente a su genérico y cómo crear restricciones y valores predeterminados para sus parámetros de tipo genérico.
 
+## Asignar Parámetros Genéricos
+
+Eche un vistazo a la siguiente función, que devuelve lo que se pasó como primer argumento:
+
+
+```ts
+function identity(value) {
+  return value;
+}
+```
+
+Puede agregar el siguiente código para que la función sea segura en TypeScript:
+
+
+```ts{1}
+function identity<T>(value: T): T {
+  return value;
+}
+```
+
+Convirtió su función en una función genérica que acepta el parámetro de tipo genérico `T`, que es el tipo del primer argumento, luego estableció el tipo de retorno para que sea el mismo con: `T`.
+
+A continuación, agregue el siguiente código para probar la función:
+
+
+```ts{5}
+function identity<T>(value: T): T {
+  return value;
+}
+
+const result = identity(123);
+```
+
+`result` tiene el tipo `123`, que es el número exacto que pasó. TypeScript aquí está infiriendo el tipo genérico del propio código de llamada. De esta forma, el código de llamada no necesita pasar ningún parámetro de tipo. También puede ser explícito y establecer los parámetros de tipo genérico en el tipo que desee:
+
+
+```ts{5}
+function identity<T>(value: T): T {
+  return value;
+}
+
+const result = identity<number>(123);
+```
+
+En este código, `result` tiene el tipo `number`. Al pasar el tipo con el código `<number>`, le está haciendo saber explícitamente a TypeScript que desea que el parámetro de tipo genérico `T` de la función `identity` sea del tipo `number`. Esto hará cumplir el tipo `number` como argumento y el valor de retorno.
+
+## Pasar Parámetros de Tipo Directamente
 
