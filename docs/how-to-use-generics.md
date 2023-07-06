@@ -267,10 +267,69 @@ export {}
 Con este código, ya no es necesario que pase un tipo al parámetro genérico `ResultType` al llamar a la función `fetchApi`, ya que tiene un tipo predeterminado de `Record<string, any>`. Esto significa que TypeScript reconocerá `data` como un objeto con claves de tipo `string` y valores de tipo `any`, lo que le permitirá acceder a sus propiedades.
 
 
-## Type Parameters Constraints
+## Restricciones de Parámetros de Tipo
+
+En algunas situaciones, un parámetro de tipo genérico necesita permitir que solo ciertas formas pasen al genérico. Para crear esta capa adicional de especificidad para su genérico, puede imponer restricciones a su parámetro.
+
+Imagine que tiene una restricción de almacenamiento en la que solo puede almacenar objetos que tienen valores de cadena para todas sus propiedades. Para eso, puedes crear una función que tome cualquier objeto y devuelva otro objeto con las mismas claves que el original, pero con todos sus valores transformados en cadenas. Esta función se llamará `stringifyObjectKeyValues`.
+
+Esta función va a ser una función genérica. De esta manera, puede hacer que el objeto resultante tenga la misma forma que el objeto original. La función se verá así:
 
 
+```ts
+function stringifyObjectKeyValues<T extends Record<string, any>>(obj: T) {
+  return Object.keys(obj).reduce((acc, key) =>  ({
+    ...acc,
+    [key]: JSON.stringify(obj[key])
+  }), {} as { [K in keyof T]: string })
+}
+```
 
 
+En este código, `stringifyObjectKeyValues` usa el [método `reduce` de matriz](https://www.digitalocean.com/community/tutorials/how-to-use-array-methods-in-javascript-iteration-methods) para iterar sobre una matriz de las claves originales, [encadenando](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify) los valores y agregándolos a una nueva matriz.
 
+Para asegurarse de que el código de llamada siempre pase un objeto a su función, está utilizando una restricción de tipo en el tipo `T` genérico, como se muestra en el siguiente código resaltado:
+
+
+```ts{1}
+function stringifyObjectKeyValues<T extends Record<string, any>>(obj: T) {
+  // ...
+}
+```
+
+`extends Record<string, any>` se conoce como restricción de tipo genérico y le permite especificar que su tipo genérico debe ser asignable al tipo que viene después de la palabra clave `extends`. En este caso, `Record<string, any>` indica un objeto con claves de tipo `string` y valores de tipo `any`. Puede hacer que su parámetro de tipo amplíe cualquier tipo de TypeScript válido.
+
+Al llamar a `reduce`, el tipo de retorno de la función reducer se basa en el valor inicial del acumulador. El código `{} as { [K in keyof T]: string }` establece el tipo del valor inicial del acumulador en `{ [K in keyof T]: string }` mediante el uso de una conversión de tipos en un objeto vacío, `{}`. El tipo `{ [K in keyof T]: string }` crea un nuevo tipo con las mismas claves que `T`, pero con todos los valores establecidos para tener el tipo `string`. Esto se conoce como un _tipo mapeado_, que este tutorial explorará más a fondo en una sección posterior.
+
+El siguiente código muestra la implementación de su función `stringifyObjectKeyValues`:
+
+
+```ts
+function stringifyObjectKeyValues<T extends Record<string, any>>(obj: T) {
+  return Object.keys(obj).reduce((acc, key) =>  ({
+    ...acc,
+    [key]: JSON.stringify(obj[key])
+  }), {} as { [K in keyof T]: string })
+}
+
+const stringifiedValues = stringifyObjectKeyValues({ a: "1", b: 2, c: true, d: [1, 2, 3]})
+```
+
+La variable `stringifiedValues` tendrá el siguiente tipo:
+
+
+```ts
+{
+  a: string;
+  b: string;
+  c: string;
+  d: string;
+}
+```
+
+Esto asegurará que el valor de retorno sea consistente con el propósito de la función.
+
+Esta sección cubrió múltiples formas de usar genéricos con funciones, incluida la asignación directa de parámetros de tipo y la creación de valores predeterminados y restricciones a la forma del parámetro. A continuación, verá algunos ejemplos de cómo los genéricos pueden hacer que las interfaces y las clases se apliquen a más situaciones.
+
+## Using Generics with Interfaces, Classes, and Types
 
