@@ -227,6 +227,50 @@ Como está utilizando `await` para procesar de forma asíncrona el resultado de 
 :::
 
 
-## Default Type Parameters
+## Parámetros de Tipo Predeterminados
+
+Al crear su función `fetchApi` genérica como lo está haciendo, el código de llamada siempre tiene que proporcionar el parámetro de tipo. Si el código de llamada no incluye el tipo genérico, `ResultType` estaría vinculado a `unknown`. Tomemos por ejemplo la siguiente implementación:
+
+
+```ts
+async function fetchApi<ResultType>(path: string): Promise<ResultType> {
+  const response = await fetch(`https://example.com/api${path}`);
+  return 
+response.json();
+}
+
+const data = await fetchApi('/users')
+
+console.log(data.a)
+
+export {}
+```
+
+Este código intenta acceder a una propiedad `a` teórica de `data`. Pero dado que el tipo de `data` es `unknown`, este código no podrá acceder a una propiedad del objeto.
+
+Si no planea agregar un tipo específico a cada llamada de su función genérica, puede agregar un tipo predeterminado al parámetro de tipo genérico. Esto se puede hacer agregando `= DefaultType` justo después del tipo genérico, así:
+
+
+```ts{1}
+async function fetchApi<ResultType = Record<string, any>>(path: string): Promise<ResultType> {
+  const response = await fetch(`https://example.com/api${path}`);
+  return response.json();
+}
+
+const data = await fetchApi('/users')
+
+console.log(data.a)
+
+export {}
+```
+
+Con este código, ya no es necesario que pase un tipo al parámetro genérico `ResultType` al llamar a la función `fetchApi`, ya que tiene un tipo predeterminado de `Record<string, any>`. Esto significa que TypeScript reconocerá `data` como un objeto con claves de tipo `string` y valores de tipo `any`, lo que le permitirá acceder a sus propiedades.
+
+
+## Type Parameters Constraints
+
+
+
+
 
 
