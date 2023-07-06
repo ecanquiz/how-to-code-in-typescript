@@ -150,3 +150,83 @@ En este código, `result` tiene el tipo `number`. Al pasar el tipo con el códig
 
 ## Pasar Parámetros de Tipo Directamente
 
+Pasar parámetros de tipo directamente también es útil cuando se usan tipos personalizados. Por ejemplo, eche un vistazo al siguiente código:
+
+
+```ts
+type ProgrammingLanguage = {
+  name: string;
+};
+
+function identity<T>(value: T): T {
+  return value;
+}
+
+const result = identity<ProgrammingLanguage>({ name: "TypeScript" });
+```
+
+
+En este código, `result` tiene el tipo personalizado `ProgrammingLanguage` porque se pasa directamente a la función `identity`. Si no incluyera el parámetro de tipo explícitamente, `result` tendría el tipo `{ name: string }` en su lugar.
+
+
+Otro ejemplo que es común cuando se trabaja con JavaScript es usar una función contenedora para recuperar datos de una API:
+
+
+```ts
+async function fetchApi(path: string) {
+  const response = await fetch(`https://example.com/api${path}`)
+  return response.json();
+}
+```
+
+Esta [función asincrónica](https://www.digitalocean.com/community/tutorials/understanding-the-event-loop-callbacks-promises-and-async-await-in-javascript) toma una ruta de URL como argumento, utiliza la [API fetch](https://www.digitalocean.com/community/tutorials/how-to-use-the-javascript-fetch-api-to-get-data) para realizar una solicitud a la URL y luego devuelve un valor de respuesta [JSON](https://www.digitalocean.com/community/tutorials/how-to-work-with-json-in-javascript). En este caso, el tipo de devolución de la función `fetchApi` será `Promise<any>`, que es el tipo de devolución de la llamada `json()` en el objeto `response` de _fetch_.
+
+
+Tener `any` como tipo de devolución no es muy útil. `any` significa cualquier valor de JavaScript y, al usarlo, pierde la verificación de tipo estática, uno de los principales beneficios de TypeScript. Si sabe que la API va a devolver un objeto en una forma determinada, puede hacer que esta función sea segura para tipos mediante el uso de genéricos:
+
+
+```ts{1}
+async function fetchApi<ResultType>(path: string): Promise<ResultType> {
+  const response = await fetch(`https://example.com/api${path}`);
+  return response.json();
+}
+```
+
+El código resaltado convierte su función en una función genérica que acepta el parámetro de tipo genérico `ResultType`. Este tipo genérico se usa en el tipo de devolución de su función: `Promise<ResultType>`.
+
+
+:::tip Nota
+Como su función es `async`, debe devolver un objeto `Promise`. El tipo `Promise` de TypeScript es en sí mismo un tipo genérico que acepta el tipo del valor al que se resuelve la promesa.
+:::
+
+Si observa más de cerca su función, verá que el genérico no se usa en la lista de argumentos ni en ningún otro lugar donde TypeScript pueda inferir su valor. Esto significa que el código de llamada debe pasar explícitamente un tipo para este genérico al llamar a su función.
+
+Aquí hay una posible implementación de la función genérica `fetchApi` para recuperar datos de usuario:
+
+
+```ts{10}
+type User = {
+  name: string;
+}
+
+async function fetchApi<ResultType>(path: string): Promise<ResultType> {
+  const response = await fetch(`https://example.com/api${path}`);
+  return response.json();
+}
+
+const data = await fetchApi<User[]>('/users')
+
+export {}
+```
+
+En este código, está creando un nuevo tipo llamado `User` y usando una matriz de ese tipo (`User[]`) como tipo para el parámetro genérico `ResultType`. La variable `data` ahora tiene el tipo `User[]` en lugar de `any`.
+
+
+:::tip Nota 
+Como está utilizando `await` para procesar de forma asíncrona el resultado de su función, el tipo de devolución será el tipo `T` en `Promise<T>`, que en este caso es el tipo genérico `ResultType`.
+:::
+
+
+## Default Type Parameters
+
+
