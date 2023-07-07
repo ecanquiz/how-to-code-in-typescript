@@ -331,5 +331,70 @@ Esto asegurará que el valor de retorno sea consistente con el propósito de la 
 
 Esta sección cubrió múltiples formas de usar genéricos con funciones, incluida la asignación directa de parámetros de tipo y la creación de valores predeterminados y restricciones a la forma del parámetro. A continuación, verá algunos ejemplos de cómo los genéricos pueden hacer que las interfaces y las clases se apliquen a más situaciones.
 
-## Using Generics with Interfaces, Classes, and Types
+## Usar Genéricos con Interfaces, Clases y Tipos
+
+Al crear [interfaces](./how-to-use-interfaces.html) y [clases](./how-to-use-classes.html) en TypeScript, puede resultar útil utilizar parámetros de tipo genérico para establecer la forma de los objetos resultantes. Por ejemplo, una clase podría tener propiedades de diferentes tipos según lo que se pase al constructor. En esta sección, verá la sintaxis para declarar parámetros de tipo genérico en clases e interfaces y examinará un caso de uso común en aplicaciones HTTP.
+
+## Interfaces y Clases Genéricas
+
+Para crear una interfaz genérica, puede agregar la lista de parámetros de tipo justo después del nombre de la interfaz:
+
+
+```ts{1,2}
+interface MyInterface<T> {
+  field: T
+}
+```
+
+Esto declara una interfaz que tiene una propiedad `field` cuyo tipo está determinado por el tipo pasado a `T`.
+
+
+Para las clases, es casi la misma sintaxis:
+
+
+```ts{1,2,3}
+class MyClass<T> {
+  field: T
+  constructor(field: T) {
+    this.field = field
+  }
+}
+```
+
+Un caso de uso común de interfaces/clases genéricas es cuando tiene un campo cuyo tipo depende de cómo el código del cliente usa la interfaz/clase. Digamos que tiene una clase `HttpApplication` que se usa para manejar solicitudes HTTP a su API, y que algún valor de contexto se pasará a cada controlador (_handler_) de solicitudes. Una de esas formas de hacer esto sería:
+
+
+```ts
+class HttpApplication<Context> {
+  context: Context
+  constructor(context: Context) {
+    this.context = context;
+  }
+
+  // ... implementation
+
+  get(url: string, handler: (context: Context) => Promise<void>): this {
+    // ... implementation
+    return this;
+  }
+}
+```
+
+Esta clase almacena un `context` cuyo tipo se pasa como el tipo del argumento para la función `handler` en el método `get`. Durante el uso, el tipo de parámetro que se pasa al controlador `get` se deducirá correctamente de lo que se pasa al constructor de la clase.
+
+
+```ts
+...
+const context = { someValue: true };
+const app = new HttpApplication(context);
+
+app.get('/api', async () => {
+  console.log(context.someValue)
+});
+```
+
+En esta implementación, TypeScript inferirá el tipo de `context.someValue` como `boolean`.
+
+
+## Generic Types
 
