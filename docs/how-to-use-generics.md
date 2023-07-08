@@ -8,7 +8,7 @@ La fuente original (en ingles) de este tutorial se encuentra [aquí](https://www
 
 Los genéricos son una característica fundamental de los lenguajes tipificados estáticamente, lo que permite a los desarrolladores pasar [tipos](./how-to-use-basic-types.html) como parámetros a otro tipo, [función](./how-to-use-functions.html) u otra estructura. Cuando un desarrollador convierte su componente en un componente genérico, le da a ese componente la capacidad de aceptar y aplicar la escritura que se pasa cuando se usa el componente, lo que mejora la flexibilidad del código, hace que los componentes sean reutilizables y elimina la duplicación.
 
-[TypeScript](https://www.typescriptlang.org/) es totalmente compatible con los genéricos como una forma de introducir la seguridad de tipos en los componentes que aceptan argumentos y devuelven valores cuyo tipo será indeterminado hasta que se consuman más adelante en su código. En este tutorial, probará ejemplos del mundo real de genéricos de TypeScript y explorará cómo se usan en funciones, tipos, [clases](./how-to-use-classes.html) e [interfaces](how-to-use-interfaces.html). También usará genéricos para crear tipos asignados y tipos condicionales, lo que lo ayudará a crear componentes de TypeScript que tengan la flexibilidad de aplicarse a todas las situaciones necesarias en su código.
+[TypeScript](https://www.typescriptlang.org/) es totalmente compatible con los genéricos como una forma de introducir la seguridad de tipos en los componentes que aceptan argumentos y devuelven valores cuyo tipo será indeterminado hasta que se consuman más adelante en su código. En este tutorial, probará ejemplos del mundo real de genéricos de TypeScript y explorará cómo se usan en funciones, tipos, [clases](./how-to-use-classes.html) e [interfaces](how-to-use-interfaces.html). También usará genéricos para crear tipos mapeados y tipos condicionales, lo que lo ayudará a crear componentes de TypeScript que tengan la flexibilidad de aplicarse a todas las situaciones necesarias en su código.
 
 
 ## Sintaxis de Genéricos
@@ -415,7 +415,7 @@ type B = MyIdentityType<number>
 
 En este caso, el tipo `B` sería de tipo `number`.
 
-Los tipos genéricos se usan comúnmente para crear tipos auxiliares, especialmente cuando se usan tipos asignados. TypeScript proporciona muchos tipos de ayuda prediseñados. Un ejemplo de ello es el tipo `Partial`, que toma un tipo `T` y devuelve otro tipo con la misma forma que `T`, pero con todos sus campos configurados como opcionales. La implementación de `Partial` se ve así:
+Los tipos genéricos se usan comúnmente para crear tipos auxiliares, especialmente cuando se usan tipos mapeados. TypeScript proporciona muchos tipos de ayuda prediseñados. Un ejemplo de ello es el tipo `Partial`, que toma un tipo `T` y devuelve otro tipo con la misma forma que `T`, pero con todos sus campos configurados como opcionales. La implementación de `Partial` se ve así:
 
 
 ```ts
@@ -535,8 +535,68 @@ Type 'number' is not assignable to type 'null'.(2322)
 Ya ha probado el uso de genéricos en interfaces, clases y tipos _helper_ personalizados. A continuación, explorará más a fondo un tema que ya ha surgido varias veces en este tutorial: crear tipos mapeados con genéricos.
 
 
-## Creating Mapped Types with Generics
+## Crear Tipos Mapeados con Genéricos
+
+Al trabajar con TypeScript, hay momentos en los que necesitará crear un tipo que debería tener la misma forma que otro tipo. Esto significa que debe tener las mismas propiedades, pero con el tipo de propiedades establecido en algo diferente. Para esta situación, el uso de tipos mapeados puede reutilizar la forma de tipo inicial y reducir el código repetido en su aplicación.
+
+En TypeScript, esta estructura se conoce como tipo mapeado y se basa en genéricos. En esta sección, verá cómo crear un tipo mapeado.
+
+Imagine que desea crear un tipo que, dado otro tipo, devuelva un nuevo tipo donde todas las propiedades están configuradas para tener un valor `boolean`. Podrías crear este tipo con el siguiente código:
 
 
+```ts
+type BooleanFields<T> = {
+  [K in keyof T]: boolean;
+}
+```
+
+En este tipo, está utilizando la sintaxis `[K in keyof T]` para especificar las propiedades que tendrá el nuevo tipo. El operador `keyof T` se usa para devolver una unión con el nombre de todas las propiedades disponibles en `T`. Luego está usando la la sintaxis `K in` para designar que las propiedades del nuevo tipo son todas las propiedades actualmente disponibles en el tipo de unión devuelto por `keyof T`.
+
+Esto crea un nuevo tipo llamado `K`, que está vinculado al nombre de la propiedad actual. Esto se puede usar para acceder al tipo de esta propiedad en el tipo original usando la sintaxis `T[K]`. En este caso, está configurando el tipo de las propiedades para que sean `boolean`.
+
+Un escenario de uso para este tipo `BooleanFields` es crear un objeto de opciones. Imagine que tiene un modelo de base de datos, como un `User`. Al obtener un registro para este modelo de la base de datos, también permitirá pasar un objeto que especifique qué campos devolver. Este objeto tendría las mismas propiedades que el modelo, pero con el tipo establecido en booleano. Pasar `true` en un campo significa que desea que se devuelva y `false` que desea que se omita.
+
+Podría usar su `BooleanFields` genérico en el tipo de modelo existente para devolver un nuevo tipo con la misma forma que el modelo, pero con todos los campos configurados para tener un tipo `boolean`, como en el siguiente código resaltado:
 
 
+```ts{10}
+type BooleanFields<T> = {
+  [K in keyof T]: boolean;
+};
+
+type User = {
+  email: string;
+  name: string;
+}
+
+type UserFetchOptions = BooleanFields<User>;
+```
+
+En este ejemplo, `UserFetchOptions` sería lo mismo que crearlo así:
+
+
+```ts
+type UserFetchOptions = {
+  email: boolean;
+  name: boolean;
+}
+```
+
+Al crear tipos mapeados, también puede proporcionar modificadores para los campos. Un ejemplo de ello es el tipo genérico existente disponible en TypeScript denominado `Readonly<T>`. El tipo `Readonly<T>` devuelve un nuevo tipo en el que todas las propiedades del tipo pasado se establecen como propiedades `readonly`. La implementación de este tipo se ve así:
+
+
+```ts
+type Readonly<T> = {
+  readonly [K in keyof T]: T[K]
+}
+```
+
+:::tip Nota
+Dado que `Readonly` ya está integrado en TypeScript, compilar este código en su entorno de TypeScript volvería a declarar `Readonly` y generaría un error. La implementación de `Readonly` citada aquí es solo para fines ilustrativos.
+:::
+
+Observe el modificador readonly que se agrega como prefijo a la parte [K in keyof T] en este código. Actualmente, los dos modificadores disponibles que se pueden usar en tipos mapeados son el modificador de solo lectura, que debe agregarse como prefijo a la propiedad, y el ? modificador, que se puede agregar como sufijo a la propiedad. El ? El modificador marca el campo como opcional. Ambos modificadores pueden recibir un prefijo especial para especificar si el modificador debe eliminarse (-) o agregarse (+). Si solo se proporciona el modificador, se asume +.
+
+Ahora que puede usar tipos mapeados para crear nuevos tipos basados en formas de tipos que ya ha creado, puede pasar al caso de uso final para genéricos: tipificación condicional.
+
+## Creating Conditional Types with Generics
