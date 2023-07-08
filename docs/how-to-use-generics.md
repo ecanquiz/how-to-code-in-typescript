@@ -396,5 +396,147 @@ app.get('/api', async () => {
 En esta implementación, TypeScript inferirá el tipo de `context.someValue` como `boolean`.
 
 
-## Generic Types
+## Tipos Genéricos
+
+Habiendo visto algunos ejemplos de genéricos en clases e interfaces, ahora puede pasar a crear tipos personalizados genéricos. La sintaxis para aplicar genéricos a tipos es similar a cómo se aplican a interfaces y clases. Echa un vistazo al siguiente código:
+
+
+```ts
+type MyIdentityType<T> = T
+```
+
+Este tipo genérico devuelve el tipo que se pasa como parámetro de tipo. Imagina que implementaste este tipo con el siguiente código:
+
+
+```ts
+...
+type B = MyIdentityType<number>
+```
+
+En este caso, el tipo `B` sería de tipo `number`.
+
+Los tipos genéricos se usan comúnmente para crear tipos auxiliares, especialmente cuando se usan tipos asignados. TypeScript proporciona muchos tipos de ayuda prediseñados. Un ejemplo de ello es el tipo `Partial`, que toma un tipo `T` y devuelve otro tipo con la misma forma que `T`, pero con todos sus campos configurados como opcionales. La implementación de `Partial` se ve así:
+
+
+```ts
+type Partial<T> = {
+  [P in keyof T]?: T[P];
+};
+```
+
+El tipo `Partial` aquí toma un tipo, itera sobre sus tipos de propiedad y luego los devuelve como opcionales en un nuevo tipo.
+
+
+:::tip Nota
+Dado que `Partial` ya está integrado en TypeScript, compilar este código en su entorno de TypeScript volvería a declarar `Partial` y generaría un error. La implementación de `Partial` citada aquí es solo para fines ilustrativos.
+:::
+
+
+Para ver cuán poderosos son los tipos genéricos, imagine que tiene un objeto literal que almacena los costos de envío de una tienda a todas las demás tiendas en su red de distribución comercial. Cada tienda estará identificada por un código de tres caracteres, así:
+
+
+```ts
+{
+  ABC: {
+    ABC: null,
+    DEF: 12,
+    GHI: 13,
+  },
+  DEF: {
+    ABC: 12,
+    DEF: null,
+    GHI: 17,
+  },
+  GHI: {
+    ABC: 13,
+    DEF: 17,
+    GHI: null,
+  },
+}
+```
+
+
+Este objeto es una colección de objetos que representan la ubicación de la tienda. Dentro de la ubicación de cada tienda, hay propiedades que representan el costo de envío a otras tiendas. Por ejemplo, el costo de envío de `ABC` a `DEF` es `12`. El costo de envío de una tienda a sí misma es `null`, ya que no habrá ningún envío.
+
+
+Para asegurarse de que las ubicaciones de otras tiendas tengan un valor constante y que el envío de una tienda a sí misma sea siempre `null`, puede crear un tipo auxiliar genérico:
+
+
+```ts
+type IfSameKeyThanParentTOtherwiseOtherType<Keys extends string, T, OtherType> = {
+  [K in Keys]: {
+    [SameThanK in K]: T;
+  } &
+    { [OtherThanK in Exclude<Keys, K>]: OtherType };
+};
+```
+
+El tipo `IfSameKeyThanParentTOtherwiseOtherType` recibe tres tipos genéricos. La primera, `Keys`, son todas las claves que desea asegurarse de que tiene su objeto. En este caso se trata de una unión de todos los códigos de las tiendas. `T` es el tipo para cuando el campo de objeto anidado tiene la misma clave que la clave en el objeto principal, que en este caso representa una ubicación de tienda que se envía a sí misma. Finalmente, `OtherType` es el tipo para cuando la clave es diferente, representando un envío de tienda a otra tienda.
+
+Puedes usarlo así:
+
+
+```ts
+...
+type Code = 'ABC' | 'DEF' | 'GHI'
+
+const shippingCosts: IfSameKeyThanParentTOtherwiseOtherType<Code, null, number> = {
+  ABC: {
+    ABC: null,
+    DEF: 12,
+    GHI: 13,
+  },
+  DEF: {
+    ABC: 12,
+    DEF: null,
+    GHI: 17,
+  },
+  GHI: {
+    ABC: 13,
+    DEF: 17,
+    GHI: null,
+  },
+}
+```
+
+Este código ahora aplica la forma del tipo. Si establece alguna de las claves en un valor no válido, TypeScript nos dará un error:
+
+
+```ts{4}
+...
+const shippingCosts: IfSameKeyThanParentTOtherwiseOtherType<Code, null, number> = {
+  ABC: {
+    ABC: 12,
+    DEF: 12,
+    GHI: 13,
+  },
+  DEF: {
+    ABC: 12,
+    DEF: null,
+    GHI: 17,
+  },
+  GHI: {
+    ABC: 13,
+    DEF: 17,
+    GHI: null,
+  },
+}
+```
+
+
+Dado que el costo de envío entre `ABC` y él mismo ya no es `null`, TypeScript arrojará el siguiente error:
+
+
+```sh
+Output
+Type 'number' is not assignable to type 'null'.(2322)
+```
+
+Ya ha probado el uso de genéricos en interfaces, clases y tipos _helper_ personalizados. A continuación, explorará más a fondo un tema que ya ha surgido varias veces en este tutorial: crear tipos mapeados con genéricos.
+
+
+## Creating Mapped Types with Generics
+
+
+
 
