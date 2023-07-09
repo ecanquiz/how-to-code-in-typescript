@@ -666,6 +666,181 @@ En este código, está creando una función llamada `someFunction`, que devuelve
 
 Como el tipo de su variable `someFunction` es una función, el tipo condicional evaluaría la rama `true` de la condición. Esto devolverá el tipo `U` como resultado. El tipo `U` se dedujo del tipo de retorno de la función, que en este caso es un `boolean`. Si verifica el tipo de `ReturnTypeOfSomeFunction`, encontrará que está configurado correctamente para tener el tipo `boolean`.
 
-## Advanced Conditional Type Use Case
+## Caso de Uso de Tipo Condicional Avanzado
+
+Los tipos condicionales son una de las características más flexibles disponibles en TypeScript y permiten la creación de algunos tipos de utilidades avanzadas. En esta sección, explorará uno de estos casos de uso mediante la creación de un tipo condicional llamado `NestedOmit<T, KeysToOmit>`. Este tipo de utilidad podrá omitir campos de un objeto, al igual que el existente [tipo de utilidad `Omit<T, KeysToOmit>`](https://www.typescriptlang.org/docs/handbook/utility-types.html#omittype-keys), pero también permitirá omitir campos anidados mediante la notación de puntos.
+
+Usando su nuevo genérico `NestedOmit<T, KeysToOmit>`, podrá usar el tipo como se muestra en el siguiente ejemplo:
+
+```ts
+type SomeType = {
+  a: {
+    b: string,
+    c: {
+      d: number;
+      e: string[]
+    },
+    f: number
+  }
+  g: number | string,
+  h: {
+    i: string,
+    j: number,
+  },
+  k: {
+    l: number,<F3>
+  }
+}
+
+type Result = NestedOmit<SomeType, "a.b" | "a.c.e" | "h.i" | "k">;
+```
+
+Este código declara un tipo denominado `SomeType` que tiene una estructura de varios niveles de propiedades anidadas. Usando su genérico `NestedOmit`, pasa el tipo, luego enumera las claves de las propiedades que le gustaría omitir. Observe cómo puede usar la notación de puntos en el segundo parámetro de tipo para identificar las claves a omitir. El tipo resultante se almacena en `Result`.
+
+La construcción de este tipo condicional utilizará muchas funciones disponibles en TypeScript, como tipos de plantilla literal, genéricos, tipos condicionales y tipos mapeados.
+
+Para probar este genérico, comience creando un tipo genérico llamado `NestedOmit` que acepte dos parámetros de tipo:
 
 
+```ts
+type NestedOmit<T extends Record<string, any>, KeysToOmit extends string>
+```
+
+El primer parámetro de tipo se llama `T`, que debe ser un tipo que se pueda asignar al tipo `Record<string, any>`. Este será el tipo de objeto del que desea omitir propiedades. El segundo parámetro de tipo se llama `KeysToOmit`, que debe ser de tipo `string`. Lo utilizará para especificar las claves que desea omitir de su tipo `T`.
+
+A continuación, verifique si `KeysToOmit` se puede asignar al tipo `${infer KeyPart1}.${infer KeyPart2}` agregando el siguiente código resaltado:
+
+
+```ts{2}
+type NestedOmit<T extends Record<string, any>, KeysToOmit extends string>
+  = KeysToOmit extends `${infer KeyPart1}.${infer KeyPart2}`
+```
+
+Aquí, está utilizando un tipo de cadena de literal de plantilla mientras aprovecha los tipos condicionales para inferir otros dos tipos dentro del propio literal de plantilla. Al deducir dos partes del tipo de cadena literal de plantilla, está dividiendo la cadena en otras dos cadenas. La primera parte se asignará al tipo `KeyPart1` y contendrá todo antes del primer punto. La segunda parte se asignará al tipo `KeyPart2` y contendrá todo después del primer punto. Si pasó `"a.b.c"` como `KeysToOmit`, inicialmente `KeyPart1` se establecería en el exacto tipo de cadena `"a"`, y `KeyPart2` se establecería en `"b.c"`.
+
+A continuación, agregará el operador ternario para definir la primera rama `true` de la condición:
+
+
+```ts{3,4}
+type NestedOmit<T extends Record<string, any>, KeysToOmit extends string>
+  = KeysToOmit extends `${infer KeyPart1}.${infer KeyPart2}`
+    ?
+      KeyPart1 extends keyof T
+```
+
+Esto usa `KeyPart1 extends keyof T` para verificar si `KeyPart1` es una propiedad válida del tipo `T` dado. En caso de que tenga una clave válida, agregue el siguiente código para que la condición se evalúe como una intersección entre los dos tipos:
+
+
+```ts{5,6,7,8,9}
+type NestedOmit<T extends Record<string, any>, KeysToOmit extends string>
+  = KeysToOmit extends `${infer KeyPart1}.${infer KeyPart2}`
+    ?
+      KeyPart1 extends keyof T
+      ?
+        Omit<T, KeyPart1>
+        & {
+          [NewKeys in KeyPart1]: NestedOmit<T[NewKeys], KeyPart2>
+        }
+```
+
+`Omit<T, KeyPart1>` es un tipo creado con el _helper_ `Omit` que se incluye de forma predeterminada con TypeScript. En este punto, `KeyPart1` no está en notación de puntos: contendrá el nombre exacto de un campo que contiene campos anidados que desea omitir del tipo original. Debido a esto, puede usar con seguridad el tipo de utilidad existente.
+
+Está utilizando `Omit` para eliminar algunos campos anidados que están dentro de `T[KeyPart1]` y, para hacerlo, debe reconstruir el tipo de `T[KeyPart1]`. Para evitar reconstruir todo el tipo `T`, use `Omit` para eliminar solo `KeyPart1` de `T`, conservando otros campos. Entonces está reconstruyendo `T[KeyPart1]` en el tipo de la siguiente parte.
+
+`[NewKeys in KeyPart1]: NestedOmit<T[NewKeys], KeyPart2>` es un tipo mapeado donde las propiedades son las que se pueden asignar a `KeyPart1`, lo que significa la parte que acaba de extraer de `KeysToOmit`. Este es el padre de los campos que desea eliminar. Si pasó `a.b.c`, durante la primera evaluación de su condición sería `NewKeys in "a"`. Luego está configurando el tipo de esta propiedad para que sea el resultado de llamar recursivamente a su tipo de utilidad `NestedOmit`, pero ahora pasa como el primer parámetro de tipo el tipo de esta propiedad dentro de `T` usando `T[NewKeys]`, y pasa como segundo parámetro de tipo el resto de claves en notación de punto, disponibles en `KeyPart2`.
+
+En la rama `false` de la condición interna, devuelve el tipo actual vinculado a `T`, como si `KeyPart1` no fuera una clave válida de `T`:
+
+
+```ts{10}
+type NestedOmit<T extends Record<string, any>, KeysToOmit extends string>
+  = KeysToOmit extends `${infer KeyPart1}.${infer KeyPart2}`
+    ?
+      KeyPart1 extends keyof T
+      ?
+        Omit<T, KeyPart1>
+        & {
+          [NewKeys in KeyPart1]: NestedOmit<T[NewKeys], KeyPart2>
+        }
+      : T
+```
+
+Esta rama del condicional significa que estás tratando de omitir un campo que no existe en `T`. En este caso, no hay necesidad de ir más lejos.
+
+Finalmente, en la rama `false` de la condición externa, use el tipo de utilidad `Omit` existente para omitir `KeysToOmit` de `Type`:
+
+
+```ts{11}
+type NestedOmit<T extends Record<string, any>, KeysToOmit extends string>
+  = KeysToOmit extends `${infer KeyPart1}.${infer KeyPart2}`
+    ?
+      KeyPart1 extends keyof T
+      ?
+        Omit<T, KeyPart1>
+        & {
+          [NewKeys in KeyPart1]: NestedOmit<T[NewKeys], KeyPart2>
+        }
+      : T
+    : Omit<T, KeysToOmit>;
+```
+
+Si es `false` la siguiente condición . . .
+```ts
+KeysToOmit extends `${infer KeyPart1}.${infer KeyPart2}`
+```
+. . . significa que `KeysToOmit` no usa la notación de puntos y, por lo tanto, puede usar el tipo de utilidad `Omit` existente.
+
+
+Ahora, para usar su nuevo tipo condicional `NestedOmit`, cree un nuevo tipo llamado `NestedObject`:
+
+
+```ts
+type NestedObject = {
+  a: {
+    b: {
+      c: number;
+      d: number;
+    };
+    e: number;
+  };
+  f: number;
+};
+```
+
+
+Luego llame a `NestedOmit` para omitir el campo anidado disponible en `a.b.c`:
+
+
+```ts
+type Result = NestedOmit<NestedObject, "a.b.c">;
+```
+
+En la primera evaluación del tipo condicional, la condición externa sería `true`, ya que el tipo de literal de cadena `"a.b.c"` se puede asignar al tipo de literal de plantilla `${infer KeyPart1}.${infer KeyPart2}`. En este caso, `KeyPart1` se deduciría como el tipo de cadena literal `"a"` y `KeyPart2` se deduciría como el resto de la cadena, en este caso `"b.c"`.
+
+La condición interna ahora va a ser evaluada. Esto se evaluará como `true`, ya que `KeyPart1` en este punto es una clave de `T`. `KeyPart1` ahora es `"a"`, y `T` tiene una propiedad `"a"`:
+
+
+```ts{2,3,4,5,6,7,8}
+type NestedObject = {
+  a: {
+    b: {
+      c: number;
+      d: number;
+    };
+    e: number;
+  };
+  f: number;
+};
+```
+
+
+Avanzando con la evaluación de la condición, ahora se encuentra dentro de la rama `true` interna. Esto crea un nuevo tipo que es una intersección de otros dos tipos. El primer tipo es el resultado de usar el tipo de utilidad `Omit` en `T` para omitir los campos que se pueden asignar a `KeyPart1`, en este caso el campo `a`. El segundo tipo es un nuevo tipo que está creando llamando a `NestedOmit` de forma recursiva.
+
+Si pasa por la próxima evaluación de `NestedOmit`, para la primera llamada recursiva, el tipo de intersección ahora está creando un tipo para usar como el tipo del campo `a`. Esto recrea el campo `a` sin los campos anidados que debe omitir.
+
+En la evaluación final de `NestedOmit`, la primera condición devolvería `false`, ya que el tipo de cadena que se pasa ahora es solo `"c"`. Cuando esto sucede, omite el campo del objeto con el _helper_ integrado. Esto devolvería el tipo para el campo `b`, que es el tipo original con `c` omitido. La evaluación ahora finaliza y TypeScript devuelve el nuevo tipo que desea usar, con el campo anidado omitido.
+
+
+## Conclusión
+
+En este tutorial, exploró los genéricos según se aplican a funciones, interfaces, clases y tipos personalizados. También usó genéricos para crear tipos mapeados y condicionales. Cada uno de estos hace que los genéricos sean una herramienta poderosa que tiene a su disposición cuando usa TypeScript. Usarlos correctamente evitará que tengas que repetir el código una y otra vez y hará que los tipos que hayas escrito sean más flexibles. Esto es especialmente cierto si es autor de una biblioteca y planea hacer que su código sea legible para una amplia audiencia.

@@ -26,6 +26,7 @@ export default defineConfig({
         { text: 'Cómo Usar Decoradores', link: '/how-to-use-decorators' },
         { text: 'Cómo Usar Interfaces', link: '/how-to-use-interfaces' },
         { text: 'Cómo Usar Genéricos', link: '/how-to-use-generics' },
+        { text: 'Cómo Usar Espacios de Nombres', link: '/how-to-use-namespaces' }
       ]
     }],
     socialLinks: [

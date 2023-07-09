@@ -3,8 +3,8 @@
 layout: home
 
 hero:
-  name: "TypeScript"
-  text: "Cómo codificar en"
+  name: "Cómo codificar en"
+  text: "TypeScript"  
   tagline: "Tutorial"
   image:
     src: /logo.png
@@ -34,5 +34,7 @@ features:
     details: TypeScript ofrece múltiples formas de representar objetos en su código, una de las cuales es usar interfaces. Las interfaces en TypeScript tienen dos escenarios de uso, puede crear un contrato que deben seguir las clases, como los miembros que esas clases deben implementar, y también puede representar tipos en su aplicación, al igual que la declaración de tipo normal. Puede notar que las interfaces y los tipos comparten un conjunto similar de características. En este tutorial, creará interfaces en TypeScript, aprenderá a usarlas y comprenderá las diferencias entre los tipos normales y las interfaces.
   - title: Cómo Usar Genéricos en TypeScript
     details: TypeScript es totalmente compatible con los genéricos como una forma de introducir la seguridad de tipos en los componentes que aceptan argumentos y devuelven valores cuyo tipo será indeterminado hasta que se consuman más adelante en su código. En este tutorial, probará ejemplos del mundo real de genéricos de TypeScript y explorará cómo se usan en funciones, tipos, clases e interfaces. También usará genéricos para crear tipos asignados y tipos condicionales, lo que lo ayudará a crear componentes de TypeScript que tengan la flexibilidad de aplicarse a todas las situaciones necesarias en su código.
+  - title: Cómo Usar Espacios de Nombres en TypeScript
+    details: En TypeScript, puede usar espacios de nombres para organizar su código. Anteriormente conocidos como módulos internos, los espacios de nombres en TypeScript se basan en un borrador inicial de los módulos ECMAScript. En este tutorial, creará y usará espacios de nombres para ilustrar la sintaxis y para qué se pueden usar. Le guiará a través de ejemplos de código de declaración y fusión de espacios de nombres, cómo funcionan los espacios de nombres como código JavaScript bajo el capó y cómo se pueden usar para declarar tipos para bibliotecas externas sin tipificación.
 footer: MIT Licensed | Copyleft © 2023-present Ernesto Canquiz
 ---
