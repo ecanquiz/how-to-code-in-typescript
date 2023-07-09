@@ -599,4 +599,73 @@ Observe el modificador readonly que se agrega como prefijo a la parte [K in keyo
 
 Ahora que puede usar tipos mapeados para crear nuevos tipos basados en formas de tipos que ya ha creado, puede pasar al caso de uso final para genéricos: tipificación condicional.
 
-## Creating Conditional Types with Generics
+## Crear Tipos Condicionales con Genéricos
+
+En esta sección, probará otra característica útil de los genéricos en TypeScript: crear tipos condicionales. En primer lugar, recorrerá la estructura básica de tipificación condicional. Luego explorará un caso de uso avanzado mediante la creación de un tipo condicional que omite los campos anidados de un tipo de objeto basado en la notación de puntos.
+
+## Estructura Básica de Tipificación Condicional
+
+Los tipos condicionales son tipos genéricos que tienen un tipo resultante diferente dependiendo de alguna [condición](https://www.digitalocean.com/community/tutorials/how-to-write-conditional-statements-in-javascript). Por ejemplo, observe el siguiente tipo genérico `IsStringType<T>`:
+
+
+```ts
+type IsStringType<T> = T extends string ? true : false;
+```
+
+En este código, está creando un nuevo tipo genérico llamado `IsStringType` que recibe un solo parámetro de tipo, `T`. Dentro de la definición de su tipo, está usando una sintaxis que parece una expresión condicional usando el operador ternario en JavaScript: `T extends string ? true : false`. Esta expresión condicional verifica si el tipo `T` extiende el tipo `string`. Si es así, el tipo resultante será exactamente el tipo `true`; de lo contrario, se establecerá en el tipo `false`.
+
+
+:::tip Nota
+Esta expresión condicional se evalúa durante la compilación. TypeScript solo funciona con tipos, así que asegúrese de leer siempre los identificadores dentro de una declaración de tipo como tipos, no como valores. En este código, está utilizando el tipo exacto de cada valor booleano, `true` y `false`.
+:::
+
+Para probar este tipo condicional, pase algunos tipos como su parámetro de tipo:
+
+
+```ts
+type IsStringType<T> = T extends string ? true : false;
+
+type A = "abc";
+type B = {
+  name: string;
+};
+
+type ResultA = IsStringType<A>;
+type ResultB = IsStringType<B>;
+```
+
+En este código, está creando dos tipos, `A` y `B`. El tipo `A` es el tipo del literal de cadena `"abc"`, mientras que el tipo `B` es el tipo de un objeto que tiene una propiedad llamada `name` de tipo `string`. A continuación, utiliza ambos tipos con su tipo condicional `IsStringType` y almacena el tipo resultante en dos nuevos tipos, `ResultA` y `ResultB`.
+
+Si verifica el tipo resultante de  `ResultA` y `ResultB`, notará que el tipo `ResultA` se establece en el tipo exacto `true` y que el tipo `ResultB` se establece en `false`. Esto es correcto, ya que `A` extiende el tipo `string` y `B` no extiende el tipo `string`, ya que se establece en el tipo de un objeto con una sola propiedad `name` de tipo `string`.
+
+Una característica útil de los tipos condicionales es que le permite inferir información de tipo dentro de la cláusula `extends` usando la palabra clave especial `infer`. Este nuevo tipo se puede usar en la rama `true` de la condición. Un posible uso de esta función es recuperar el tipo de retorno de cualquier tipo de función.
+
+Escriba el siguiente tipo `GetReturnType` para ilustrar esto:
+
+
+```ts
+type GetReturnType<T> = T extends (...args: any[]) => infer U ? U : never;
+```
+
+En este código, está creando un nuevo tipo genérico, que es un tipo condicional llamado `GetReturnType`. Este tipo genérico acepta un solo parámetro de tipo, `T`. Dentro de la declaración de tipo en sí, está verificando si el tipo `T` extiende un tipo que coincide con una firma de función que acepta un número variable de argumentos (incluido cero), y luego está infiriendo el tipo de retorno de esa función creando un nuevo tipo `U`, que está disponible para ser utilizado dentro de la rama `true` de la condición. El tipo de `U` estará ligado al tipo del valor de retorno de la función pasada. Si el tipo `T` pasado no es una función, entonces el código devolverá el tipo `never`.
+
+Usa tu tipo con el siguiente código:
+
+
+```ts
+type GetReturnType<T> = T extends (...args: any[]) => infer U ? U : never;
+
+function someFunction() {
+  return true;
+}
+
+type ReturnTypeOfSomeFunction = GetReturnType<typeof someFunction>;
+```
+
+En este código, está creando una función llamada `someFunction`, que devuelve `true`. A continuación, utiliza el operador `typeof` para pasar el tipo de esta función al tipo genérico `GetReturnType` y almacena el tipo resultante en el tipo `ReturnTypeOfSomeFunction`.
+
+Como el tipo de su variable `someFunction` es una función, el tipo condicional evaluaría la rama `true` de la condición. Esto devolverá el tipo `U` como resultado. El tipo `U` se dedujo del tipo de retorno de la función, que en este caso es un `boolean`. Si verifica el tipo de `ReturnTypeOfSomeFunction`, encontrará que está configurado correctamente para tener el tipo `boolean`.
+
+## Advanced Conditional Type Use Case
+
+
