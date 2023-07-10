@@ -202,7 +202,7 @@ namespace DatabaseEntity {
 El código JavaScript generado se vería así:
 
 
-```ts
+```js
 "use strict";
 var DatabaseEntity;
 (function (DatabaseEntity) {
@@ -234,5 +234,131 @@ Ahora ha echado un vistazo a la sintaxis de los espacios de nombres de TypeScrip
 
 ## Usar Espacios de Nombres para Proporcionar Tipado a Bibliotecas Externas
 
+En esta sección, recorrerá uno de los escenarios en los que los espacios de nombres son útiles: la creación de declaraciones de módulos para bibliotecas externas. Para hacer esto, escribirá un nuevo archivo en su proyecto de TypeScript para declarar el tipado, luego cambie su archivo `tsconfig.json` para que el compilador de TypeScript reconozca el tipo.
+
+:::tip Nota
+Para seguir los siguientes pasos, es necesario un entorno TypeScript con acceso al sistema de archivos. Si está utilizando TypeScript Playground, puede exportar el código existente a un proyecto de CodeSandbox haciendo clic en **Export** en el menú superior y luego en **Open in CodeSandbox**. Esto le permitirá crear nuevos archivos y editar el archivo `tsconfig.json`.
+:::
+
+No todos los paquetes disponibles en el registro [npm](https://www.npmjs.com/) incluyen su propia declaración de módulo TypeScript. Esto significa que al instalar un paquete en su proyecto, puede encontrar un error de compilación relacionado con la declaración de tipo faltante del paquete o tener que trabajar con una biblioteca que tiene todos sus tipos establecidos en `any`. Dependiendo de qué tan estrictamente esté usando TypeScript, esto puede ser un resultado no deseado.
+
+Con suerte, este paquete tendrá un paquete `@types` creado por la comunidad [DefinetelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped), lo que le permitirá instalar el paquete y obtener tipos de trabajo para esa biblioteca. Sin embargo, este no es siempre el caso y, a veces, tendrá que lidiar con una biblioteca que no incluye su propia declaración de módulo de tipo. En este caso, si desea mantener su código completamente seguro, debe crear la declaración del módulo usted mismo.
+
+Como ejemplo, imagina que estás usando una biblioteca de vectores llamada `example-vector3` que exporta una sola clase, `Vector3`, con un solo método, `add`. Este método se utiliza para sumar dos vectores `Vector3` juntos.
+
+El código en la biblioteca podría ser algo como lo siguiente:
 
 
+```js
+export class Vector3 {
+  super(x, y, z) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
+  }
+
+  add(vec) {
+    let x = this.x + vector.x;
+    let y = this.y + vector.y;
+    let z = this.z + vector.z;
+
+    let newVector = new Vector3(x, y, z);
+
+    return newVector
+  }
+}
+```
+
+Esto exporta una clase que crea vectores con propiedades `x`, `y` y `z`, destinados a representar los componentes de coordenadas del vector.
+
+A continuación, eche un vistazo a un fragmento de código de ejemplo que utiliza la biblioteca hipotética:
+
+📃`index.ts`
+```ts
+import { Vector3 } from "example-vector3";
+
+const v1 = new Vector3(1, 2, 3);
+const v2 = new Vector3(1, 2, 3);
+
+const v3 = v1.add(v2);
+```
+
+La biblioteca `example-vector3` no incluye su propia declaración de tipo, por lo que el compilador de TypeScript generará el error `2307`:
+
+
+```sh
+Output
+Cannot find module 'example-vector3' or its corresponding type declarations. ts(2307)
+```
+
+Para solucionar este problema, ahora creará un archivo de declaración de tipos para este paquete. Primero, cree un nuevo archivo llamado `types/example-vector3/index.d.ts` y ábralo en su editor favorito. Dentro de este archivo escribe el siguiente código:
+
+
+📃`types/example-vector3/index.d.ts`
+```ts
+declare module "example-vector3" {
+  export = vector3;
+
+  namespace vector3 {
+  }
+}
+```
+
+En este código, está creando la declaración de tipo para el módulo `example-vector3`. La primera parte del código es el propio bloque `declare module`. El compilador de TypeScript analizará este bloque e interpretará todo lo que contiene como si fuera la representación de tipo del módulo en sí. Esto significa que todo lo que declare aquí, TypeScript lo utilizará para inferir el tipo del módulo. En este momento, está diciendo que este módulo exporta un solo espacio de nombres llamado `vector3`, que actualmente está vacío.
+
+Guardar y salir de este archivo.
+
+El compilador de TypeScript actualmente no conoce su archivo de declaración, por lo que debe incluirlo en su `tsconfig.json`. Para hacer esto, edite el archivo `tsconfig.json` agregando la propiedad `types` a la opción `compilerOptions`:
+
+
+📃`tsconfig.json`
+```json
+{
+  "compilerOptions": {
+    ...
+    "types": ["./types/example-vector3/index.d.ts"]
+  }
+}
+```
+
+
+Ahora, si regresa a su código original, verá que el error ha cambiado. El compilador de TypeScript ahora está dando el error `2305`:
+
+```sh
+Output
+Module '"example-vector3"' has no exported member 'Vector3'. ts(2305)
+```
+
+Mientras creaba la declaración del módulo para `example-vector3`, la exportación está configurada actualmente en un espacio de nombres vacío. No se exporta ninguna clase `Vector3` desde ese espacio de nombres.
+
+Vuelva a abrir `types/example-vector3/index.d.ts` y escriba el siguiente código:
+
+
+📃`types/example-vector3/index.d.ts`
+```ts{5,6,7,8}
+declare module "example-vector3" {
+  export = vector3;
+
+  namespace vector3 {
+    export class Vector3 {
+      constructor(x: number, y: number, z: number);
+      add(vec: Vector3): Vector3;
+    }
+  }
+}
+```
+
+En este código, observe cómo ahora está exportando una clase dentro del espacio de nombres `vector3`. El objetivo principal de las declaraciones de módulos es proporcionar la información de tipo de valores que expone una biblioteca. De esta manera, puede usarlo de una manera segura.
+
+En este caso, sabe que la biblioteca `example-vector3` proporciona una clase llamada `Vector3` que acepta tres números en el constructor, y que tiene un método `add` que se usa para agregar dos instancias `Vector3`, devolviendo una nueva instancia como resultado. No necesita proporcionar la implementación aquí, solo la información del tipo en sí. Las declaraciones que no proporcionan una implementación se conocen como declaraciones _ambientales_ en TypeScript, y es común crearlas dentro del archivo `.d.ts`.
+
+Este código ahora se compilará correctamente y tendrá los tipos correctos para la clase `Vector3`.
+
+Con los espacios de nombres, puede aislar lo que exporta la biblioteca en una sola unidad de tipo, que en este caso es el espacio de nombres `vector3`. Esto hace que sea más fácil personalizar la declaración del módulo en el futuro o incluso hacer que la declaración de tipo esté disponible para todos los desarrolladores al enviarla al [repositorio `DefinetelyTyped`](https://github.com/DefinitelyTyped/DefinitelyTyped).
+
+
+## Conclusión
+
+En este tutorial, repasó la sintaxis básica de los espacios de nombres en TypeScript y examinó el JavaScript en el que lo convierte el compilador de TypeScript. También probó un caso de uso común de espacios de nombres: proporcionar escritura ambiental para bibliotecas externas que aún no están escritas.
+
+Si bien los espacios de nombres no están en desuso, no siempre se recomienda usar espacios de nombres como mecanismo de organización de código en su base de código. El código moderno debe usar la [sintaxis del Módulo ES](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules), ya que tiene todas las funciones proporcionadas por los espacios de nombres y, a partir de ECMAScript 2015, se convirtió en parte de la especificación. Sin embargo, al crear declaraciones de módulos, aún se recomienda el uso de espacios de nombres, ya que permite declaraciones de tipo más concisas.
