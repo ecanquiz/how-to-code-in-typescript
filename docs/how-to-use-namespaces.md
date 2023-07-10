@@ -135,5 +135,104 @@ Dentro de su nueva declaración de espacio de nombres `DatabaseEntity`, puede us
 Ahora que ha echado un vistazo a la sintaxis básica de los espacios de nombres, puede pasar a examinar cómo el Compilador de TypeScript traduce los espacios de nombres a JavaScript.
 
 
-## Examining the JavaScript Code Generated When Using Namespaces
+## Examinar el Código JavaScript Generado al Usar Espacios de Nombres
+
+Los espacios de nombres en TypeScript no son solo una función de tiempo de compilación; también cambian el código JavaScript resultante. Para obtener más información sobre cómo funcionan los espacios de nombres, puede analizar el JavaScript que impulsa esta característica de TypeScript. En este paso, tomará los fragmentos de código de la última sección y examinará su implementación de JavaScript subyacente.
+
+Toma el código que usaste en el primer ejemplo:
+
+
+```ts
+namespace DatabaseEntity {
+  export class User {
+    constructor(public name: string) {}
+  }
+
+  export const newUser = new User("Jon");
+}
+
+console.log(DatabaseEntity.newUser.name);
+```
+
+El compilador de TypeScript generaría el siguiente código JavaScript para este fragmento de código de TypeScript:
+
+
+```js
+"use strict";
+var DatabaseEntity;
+(function (DatabaseEntity) {
+    class User {
+        constructor(name) {
+            this.name = name;
+        }
+    }
+    DatabaseEntity.User = User;
+    DatabaseEntity.newUser = new User("Jon");
+})(DatabaseEntity || (DatabaseEntity = {}));
+console.log(DatabaseEntity.newUser.name);
+```
+
+Para declarar el espacio de nombres `DatabaseEntity`, el compilador de TypeScript crea una variable no inicializada denominada `DatabaseEntity` y, a continuación, crea una [Expresión de Función Invocada Inmediatamente](https://developer.mozilla.org/en-US/docs/Glossary/IIFE) (IIFE). Este IIFE recibe un solo parámetro `DatabaseEntity || (DatabaseEntity = {})`, que es el valor actual de la variable `DatabaseEntity`. Si no se establece en un valor real, establece el valor de la variable en un objeto vacío.
+
+Establecer el valor de su `DatabaseEntity` en un valor vacío al pasarlo al IIFE funciona porque el valor de retorno de una operación de asignación es el valor que se asigna. En este caso, este es el objeto vacío.
+
+Dentro del IIFE, la clase `User` se crea y luego se asigna a la propiedad `User` del objeto `DatabaseEntity`. Lo mismo ocurre con la propiedad `newUser`, donde asigna la propiedad al valor de una nueva instancia `User`.
+
+Ahora eche un vistazo al segundo ejemplo de código, donde tenía varias declaraciones de espacios de nombres:
+
+
+```ts
+namespace DatabaseEntity {
+  export class User {
+    constructor(public name: string) {}
+  }
+
+  export const newUser = new User("Jon");
+}
+
+namespace DatabaseEntity {
+  export class UserRole {
+    constructor(public user: User, public role: string) {}
+  }
+
+  export const newUserRole = new UserRole(newUser, "admin");
+}
+```
+
+El código JavaScript generado se vería así:
+
+
+```ts
+"use strict";
+var DatabaseEntity;
+(function (DatabaseEntity) {
+    class User {
+        constructor(name) {
+            this.name = name;
+        }
+    }
+    DatabaseEntity.User = User;
+    DatabaseEntity.newUser = new User("Jon");
+})(DatabaseEntity || (DatabaseEntity = {}));
+(function (DatabaseEntity) {
+    class UserRole {
+        constructor(user, role) {
+            this.user = user;
+            this.role = role;
+        }
+    }
+    DatabaseEntity.UserRole = UserRole;
+    DatabaseEntity.newUserRole = new UserRole(DatabaseEntity.newUser, "admin");
+})(DatabaseEntity || (DatabaseEntity = {}));
+```
+
+El comienzo del código se ve igual que antes, con la variable `DatabaseEntity` sin inicializar y luego un IIFE con el código real configurando las propiedades del objeto `DatabaseEntity`. Esta vez, aunque también tienes otro IIFE. Este nuevo IIFE coincide con la segunda declaración de su espacio de nombres `DatabaseEntity`.
+
+Ahora, cuando se ejecuta el segundo IIFE, `DatabaseEntity` ya está vinculado a un objeto, por lo que solo está ampliando el objeto ya disponible agregando propiedades adicionales.
+
+Ahora ha echado un vistazo a la sintaxis de los espacios de nombres de TypeScript y cómo funcionan en el JavaScript subyacente. Con este contexto, ahora puede ejecutar un caso de uso común para espacios de nombres: definir tipos para bibliotecas externas sin tipado.
+
+## Usar Espacios de Nombres para Proporcionar Tipado a Bibliotecas Externas
+
+
 
