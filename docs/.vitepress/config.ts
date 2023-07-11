@@ -3,7 +3,7 @@ import { defineConfig } from 'vitepress'
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   title: 'Cómo codificar en TS',
-  description: 'TDD con Vue 3.',
+  description: 'Cómo codificar en TypeScript',
   base: '/how-to-code-in-typescript/',
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
