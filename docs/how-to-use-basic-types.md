@@ -323,7 +323,7 @@ const resultOfVoidFunction: void = doSomething();
 
 Rara vez tendrá que usar el tipo `void` directamente en TypeScript.
 
-## null y undefined
+## `null` y `undefined`
 
 Los valores `null` y `undefined` en TypeScript tienen sus propios tipos únicos que reciben el mismo nombre:
 
