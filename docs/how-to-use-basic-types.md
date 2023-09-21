@@ -121,7 +121,6 @@ Pruebe el código en el siguiente bloque:
 const hasErrors: boolean = true;
 const isValid: boolean = false;
 ```
-Since hasErrors and isValid were declared as booleans, they can only be assigned the values true and false. Note that truthy and falsy values are not converted into their boolean equivalents and will throw an error if used with these variables.
 
 Dado que `hasErrors` e `isValid` se declararon como booleanos, solo se les pueden asignar los valores `true` y `false`. Tenga en cuenta que los valores [truthy](https://developer.mozilla.org/en-US/docs/Glossary/Truthy) y [falsy](https://developer.mozilla.org/en-US/docs/Glossary/Falsy) no se convierten en sus equivalentes booleanos y arrojarán un error si se usan con estas variables.
 
@@ -325,8 +324,6 @@ const resultOfVoidFunction: void = doSomething();
 Rara vez tendrá que usar el tipo `void` directamente en TypeScript.
 
 ## null y undefined
-
-null and undefined values in TypeScript have their own unique types that are called by the same name:
 
 Los valores `null` y `undefined` en TypeScript tienen sus propios tipos únicos que reciben el mismo nombre:
 
